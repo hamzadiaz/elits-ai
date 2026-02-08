@@ -17,6 +17,7 @@ const links = [
   { href: '/create', label: 'Create' },
   { href: '/train', label: 'Train' },
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/turing', label: 'Turing Test' },
 ]
 
 export function Navbar() {
