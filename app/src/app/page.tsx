@@ -99,30 +99,44 @@ const features = [
   {
     icon: Mic,
     title: 'Voice Training',
-    description: 'Talk naturally to your Elit. It learns your knowledge, personality, and unique communication style through real conversations.',
+    description: 'Talk naturally to your Elit via Gemini Live. It learns your knowledge, personality, and unique communication style through real conversations.',
     gradient: 'from-purple-500/20 to-blue-500/20',
     glow: 'group-hover:shadow-[0_0_40px_rgba(124,58,237,0.15)]',
   },
   {
     icon: Brain,
-    title: 'AI Personality Engine',
-    description: 'Deep personality modeling — your expertise, values, decision patterns, and voice. A true digital clone.',
+    title: '3D AI Avatar',
+    description: 'Upload a photo and AI generates a stylized 3D avatar with idle, speaking, and thinking animations. Your visual identity on-chain.',
     gradient: 'from-blue-500/20 to-cyan-500/20',
     glow: 'group-hover:shadow-[0_0_40px_rgba(59,130,246,0.15)]',
   },
   {
     icon: Zap,
-    title: 'Act On Your Behalf',
-    description: 'Your Elit posts, codes, responds, and researches — all in your authentic style with delegated on-chain permissions.',
+    title: 'Actions & Delegation',
+    description: 'Your Elit posts tweets, writes code, responds to messages — with scoped, time-limited delegations you fully control.',
     gradient: 'from-cyan-500/20 to-emerald-500/20',
     glow: 'group-hover:shadow-[0_0_40px_rgba(6,182,212,0.15)]',
   },
   {
     icon: Shield,
-    title: 'Verified on Solana',
-    description: 'On-chain cryptographic proof that your Elit is authorized by you. Anyone can verify. One transaction to revoke.',
-    gradient: 'from-emerald-500/20 to-purple-500/20',
+    title: 'On-Chain Verification',
+    description: 'Personality hash stored on Solana. Anyone can verify your Elit is authorized by you. One transaction to revoke everything.',
+    gradient: 'from-emerald-500/20 to-yellow-500/20',
     glow: 'group-hover:shadow-[0_0_40px_rgba(16,185,129,0.15)]',
+  },
+  {
+    icon: Fingerprint,
+    title: 'Turing Test',
+    description: 'Can people tell the difference? Blind comparison between you and your Elit proves how authentic your AI clone really is.',
+    gradient: 'from-yellow-500/20 to-pink-500/20',
+    glow: 'group-hover:shadow-[0_0_40px_rgba(234,179,8,0.15)]',
+  },
+  {
+    icon: Globe,
+    title: 'Emergency Kill Switch',
+    description: 'Full control over your clone. Revoke all delegations, disable actions instantly. Your AI, your rules.',
+    gradient: 'from-pink-500/20 to-purple-500/20',
+    glow: 'group-hover:shadow-[0_0_40px_rgba(236,72,153,0.15)]',
   },
 ]
 
@@ -339,7 +353,7 @@ export default function LandingPage() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-5"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
           >
             {features.map((feature) => (
               <motion.div
@@ -406,6 +420,56 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Try It / Live Demo */}
+      <section className="py-28 px-4 border-t border-white/[0.04]">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <p className="text-sm font-medium text-primary-light/70 uppercase tracking-widest mb-3">Experience</p>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-4">
+              Try It Yourself
+            </h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">
+              Create your Elit in minutes. No cost, no commitment — just connect your wallet and start.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={staggerChildren}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-5"
+          >
+            {[
+              { href: '/create', icon: Sparkles, title: 'Create Your Elit', desc: 'Define your personality and generate a 3D avatar in 4 easy steps.', gradient: 'from-primary/10 to-blue/10' },
+              { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your clone who you are.', gradient: 'from-blue/10 to-cyan-500/10' },
+              { href: '/turing', icon: Fingerprint, title: 'Take the Turing Test', desc: 'Can you tell the AI from the human? 5 rounds, blind comparison.', gradient: 'from-cyan-500/10 to-accent/10' },
+            ].map((item) => (
+              <motion.div key={item.href} variants={fadeUp} transition={{ duration: 0.5 }}>
+                <Link
+                  href={item.href}
+                  className={`group block gradient-border p-7 rounded-2xl hover:shadow-[0_0_40px_rgba(124,58,237,0.1)] transition-all`}
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-5 border border-white/[0.06] group-hover:scale-110 transition-transform`}>
+                    <item.icon className="w-5 h-5 text-white/80" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-primary-light transition-colors">{item.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                  <div className="mt-4 flex items-center gap-1 text-sm text-primary-light/70 group-hover:text-primary-light transition-colors">
+                    Try now <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
