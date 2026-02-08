@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Zap, Menu, X } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -21,77 +22,126 @@ const links = [
 export function Navbar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
-              E
+    <>
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-black/60 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-primary-dark to-blue flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                <Zap className="w-4 h-4 relative z-10" fill="currentColor" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+              <span className="font-bold text-lg tracking-tight">
+                <span className="text-white">Elits</span>
+                <span className="gradient-text ml-0.5">AI</span>
+              </span>
+            </Link>
+
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-1">
+              {links.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    pathname === link.href
+                      ? 'text-white'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {pathname === link.href && (
+                    <motion.div
+                      layoutId="nav-active"
+                      className="absolute inset-0 bg-white/[0.08] rounded-lg border border-white/[0.06]"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                </Link>
+              ))}
             </div>
-            <span className="font-bold text-lg gradient-text">Elits AI</span>
-          </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {links.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  pathname === link.href
-                    ? 'text-white bg-white/10'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
+            {/* Right side */}
+            <div className="flex items-center gap-3">
+              <WalletMultiButton style={{
+                background: 'linear-gradient(135deg, #7c3aed, #3b82f6)',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: '600',
+                height: '36px',
+                padding: '0 16px',
+                border: 'none',
+                boxShadow: '0 0 20px rgba(124, 58, 237, 0.2)',
+                transition: 'all 0.3s',
+              }} />
+              <button
+                className="md:hidden text-gray-400 hover:text-white transition-colors"
+                onClick={() => setMobileOpen(!mobileOpen)}
               >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <WalletMultiButton style={{
-              background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-              borderRadius: '12px',
-              fontSize: '14px',
-              height: '40px',
-            }} />
-            <button
-              className="md:hidden text-gray-400 hover:text-white"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-              </svg>
-            </button>
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
+      </motion.nav>
 
+      {/* Mobile menu */}
+      <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="md:hidden pb-4"
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-40 md:hidden"
           >
-            {links.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`block px-4 py-2 rounded-lg text-sm font-medium ${
-                  pathname === link.href ? 'text-white bg-white/10' : 'text-gray-400'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setMobileOpen(false)} />
+            <div className="absolute right-0 top-0 bottom-0 w-72 bg-[#0a0a0a] border-l border-white/[0.06] p-6 pt-20">
+              <div className="space-y-1">
+                {links.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`block px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                        pathname === link.href
+                          ? 'text-white bg-white/[0.08] border border-white/[0.06]'
+                          : 'text-gray-500 hover:text-white hover:bg-white/[0.04]'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </motion.div>
         )}
-      </div>
-    </motion.nav>
+      </AnimatePresence>
+    </>
   )
 }
