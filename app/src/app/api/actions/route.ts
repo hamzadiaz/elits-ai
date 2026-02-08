@@ -1,7 +1,9 @@
 import { GoogleGenAI } from '@google/genai'
 import { NextRequest, NextResponse } from 'next/server'
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' })
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' })
+}
 
 export type ActionType = 'post_tweet' | 'write_code' | 'respond_message' | 'research'
 
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     const fullPrompt = `${systemPrompt}\n\n${ACTION_SYSTEM_PROMPTS[type]}\n\nUser request: ${prompt}`
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: 'gemini-2.5-flash',
       contents: fullPrompt,
     })
