@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChatInterface } from '@/components/ChatInterface'
+import { Avatar3D } from '@/components/Avatar3D'
 import { ShieldCheck, Brain, ChevronRight } from 'lucide-react'
 
 interface Message {
@@ -15,13 +16,18 @@ export default function ChatWithElitPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [systemPrompt, setSystemPrompt] = useState('')
   const [elitName, setElitName] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const prompt = localStorage.getItem('elitSystemPrompt')
     const profile = localStorage.getItem('elitProfile')
     if (prompt) setSystemPrompt(prompt)
     if (profile) {
-      try { setElitName(JSON.parse(profile).name) } catch {}
+      try {
+        const p = JSON.parse(profile)
+        setElitName(p.name)
+        setAvatarUrl(p.avatarUrl || null)
+      } catch {}
     }
     if (prompt) {
       setMessages([{
@@ -71,13 +77,18 @@ export default function ChatWithElitPage() {
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col max-w-4xl mx-auto">
-      {/* Verified badge header */}
-      <div className="px-4 pt-4">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-400/5 border border-green-400/10 w-fit">
-          <ShieldCheck className="w-4 h-4 text-green-400" />
-          <span className="text-xs text-green-400 font-medium">On-chain Verified</span>
-          <span className="text-xs text-gray-600">·</span>
-          <span className="text-xs text-gray-500">{elitName}&apos;s Elit</span>
+      {/* Header with avatar */}
+      <div className="px-4 pt-4 flex items-center gap-3">
+        <Avatar3D avatarUrl={avatarUrl} name={elitName || '?'} size="sm" state={isLoading ? 'thinking' : 'idle'} />
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-white">{elitName}&apos;s Elit</span>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/20">
+              <ShieldCheck className="w-3 h-3 text-green-400" />
+              <span className="text-[10px] text-green-400 font-medium">Verified</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600">Personality-driven responses</p>
         </div>
       </div>
 

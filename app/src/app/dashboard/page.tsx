@@ -6,17 +6,15 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { type PersonalityProfile } from '@/lib/personality'
-import { Wallet, Zap, Lightbulb, MessageSquare, ShieldCheck, Mic, Brain, ChevronRight, AlertTriangle, Activity, Clock, TrendingUp } from 'lucide-react'
+import { Avatar3D } from '@/components/Avatar3D'
+import { Wallet, Zap, Lightbulb, MessageSquare, ShieldCheck, Mic, Brain, ChevronRight, AlertTriangle, Activity, Clock, TrendingUp, Phone } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
   { ssr: false }
 )
 
-const fadeUp = {
-  initial: { opacity: 0, y: 15 },
-  animate: { opacity: 1, y: 0 },
-}
+const fadeUp = { initial: { opacity: 0, y: 15 }, animate: { opacity: 1, y: 0 } }
 
 export default function DashboardPage() {
   const { connected, publicKey } = useWallet()
@@ -47,12 +45,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <motion.div
-        initial="initial"
-        animate="animate"
-        transition={{ staggerChildren: 0.06 }}
-      >
-        {/* Header */}
+      <motion.div initial="initial" animate="animate" transition={{ staggerChildren: 0.06 }}>
         <motion.div variants={fadeUp} className="mb-8">
           <h1 className="text-2xl font-bold gradient-text-white mb-1">Dashboard</h1>
           <p className="text-gray-600 text-sm">Manage your Elit, review training, and control delegations.</p>
@@ -60,12 +53,10 @@ export default function DashboardPage() {
 
         {profile ? (
           <div className="space-y-5">
-            {/* Profile card */}
+            {/* Profile card with avatar */}
             <motion.div variants={fadeUp} className="gradient-border rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-dark to-blue flex items-center justify-center text-xl font-bold text-white shrink-0 shadow-[0_0_30px_rgba(124,58,237,0.2)]">
-                  {profile.name?.charAt(0)?.toUpperCase() || '?'}
-                </div>
+                <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold text-white">{profile.name}&apos;s Elit</h2>
                   <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{profile.bio}</p>
@@ -81,12 +72,11 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Stats grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-primary-light', bg: 'from-primary/15 to-primary/5' },
-                  { label: 'Interests', value: profile.interests.length.toString(), icon: Lightbulb, color: 'text-blue', bg: 'from-blue/15 to-blue/5' },
-                  { label: 'Messages', value: profile.trainingMessages?.length?.toString() || '0', icon: MessageSquare, color: 'text-accent', bg: 'from-accent/15 to-accent/5' },
+                  { label: 'Knowledge', value: (profile.knowledgeGraph?.length || 0).toString(), icon: Lightbulb, color: 'text-blue', bg: 'from-blue/15 to-blue/5' },
+                  { label: 'Sessions', value: (profile.trainingSessions?.length || 0).toString(), icon: Phone, color: 'text-accent', bg: 'from-accent/15 to-accent/5' },
                   { label: 'Status', value: hash ? 'Verified' : 'Pending', icon: ShieldCheck, color: hash ? 'text-green-400' : 'text-yellow-400', bg: hash ? 'from-green-400/15 to-green-400/5' : 'from-yellow-400/15 to-yellow-400/5' },
                 ].map(stat => (
                   <div key={stat.label} className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4 hover:border-white/[0.08] transition-colors">
@@ -100,7 +90,6 @@ export default function DashboardPage() {
               </div>
             </motion.div>
 
-            {/* Personality Hash */}
             {hash && (
               <motion.div variants={fadeUp} className="gradient-border rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -114,7 +103,30 @@ export default function DashboardPage() {
               </motion.div>
             )}
 
-            {/* Activity feed */}
+            {/* Knowledge graph */}
+            {profile.knowledgeGraph && profile.knowledgeGraph.length > 0 && (
+              <motion.div variants={fadeUp} className="gradient-border rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Lightbulb className="w-4 h-4 text-blue" />
+                  <h3 className="text-sm font-semibold text-white">Knowledge Graph</h3>
+                </div>
+                <div className="space-y-2">
+                  {profile.knowledgeGraph.map((k, i) => (
+                    <div key={i} className="flex items-center gap-3 py-2 border-b border-white/[0.02] last:border-0">
+                      <span className="text-sm text-gray-300 flex-1">{k.topic}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        k.expertiseLevel === 'expert' ? 'bg-green-400/15 text-green-400' :
+                        k.expertiseLevel === 'advanced' ? 'bg-blue/15 text-blue' :
+                        k.expertiseLevel === 'intermediate' ? 'bg-primary/15 text-primary-light' :
+                        'bg-white/[0.05] text-gray-500'
+                      }`}>{k.expertiseLevel}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Activity */}
             <motion.div variants={fadeUp} className="gradient-border rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="w-4 h-4 text-blue" />
@@ -123,16 +135,13 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {[
                   { icon: Brain, text: 'Elit created', time: 'Just now', color: 'text-primary-light' },
-                  { icon: MessageSquare, text: `${profile.trainingMessages?.length || 0} training messages exchanged`, time: '5m ago', color: 'text-blue' },
-                  { icon: ShieldCheck, text: hash ? 'Personality hash verified' : 'Awaiting verification', time: '10m ago', color: hash ? 'text-green-400' : 'text-yellow-400' },
+                  { icon: MessageSquare, text: `${profile.trainingMessages?.length || 0} training messages`, time: 'Training', color: 'text-blue' },
+                  { icon: ShieldCheck, text: hash ? 'Personality hash verified' : 'Awaiting verification', time: '', color: hash ? 'text-green-400' : 'text-yellow-400' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 py-2 border-b border-white/[0.02] last:border-0">
                     <item.icon className={`w-3.5 h-3.5 ${item.color} shrink-0`} />
                     <span className="text-sm text-gray-400 flex-1">{item.text}</span>
-                    <div className="flex items-center gap-1 text-[10px] text-gray-700">
-                      <Clock className="w-3 h-3" />
-                      {item.time}
-                    </div>
+                    {item.time && <div className="flex items-center gap-1 text-[10px] text-gray-700"><Clock className="w-3 h-3" />{item.time}</div>}
                   </div>
                 ))}
               </div>
@@ -155,15 +164,11 @@ export default function DashboardPage() {
             {/* Quick actions */}
             <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { href: '/train', icon: Mic, title: 'Continue Training', desc: 'Make your Elit smarter', gradient: 'from-primary/10 to-primary/5' },
+                { href: '/train', icon: Mic, title: 'Continue Training', desc: 'Chat or voice train', gradient: 'from-primary/10 to-primary/5' },
                 { href: '/chat/default', icon: MessageSquare, title: 'Chat with Elit', desc: 'Test your AI clone', gradient: 'from-blue/10 to-blue/5' },
                 { href: '/verify/default', icon: ShieldCheck, title: 'Verify Elit', desc: 'View on-chain proof', gradient: 'from-accent/10 to-accent/5' },
               ].map(action => (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className="group gradient-border rounded-2xl p-5 hover:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all"
-                >
+                <Link key={action.href} href={action.href} className="group gradient-border rounded-2xl p-5 hover:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all">
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} border border-white/[0.06] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                     <action.icon className="w-4 h-4 text-white/70" />
                   </div>
@@ -192,10 +197,7 @@ export default function DashboardPage() {
             </div>
             <h2 className="text-2xl font-bold gradient-text-white mb-3">No Elit Yet</h2>
             <p className="text-gray-600 mb-8 text-sm">Create your AI clone to get started.</p>
-            <Link
-              href="/create"
-              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-primary-dark to-blue text-white font-semibold btn-glow hover:scale-[1.02] transition-transform"
-            >
+            <Link href="/create" className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-primary-dark to-blue text-white font-semibold btn-glow hover:scale-[1.02] transition-transform">
               Create Your Elit
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>

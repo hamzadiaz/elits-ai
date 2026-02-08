@@ -1,6 +1,24 @@
+export interface KnowledgeEntry {
+  topic: string
+  expertiseLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  details: string[]
+  lastUpdated: string
+}
+
+export interface TrainingSession {
+  id: string
+  date: string
+  type: 'chat' | 'voice'
+  messageCount: number
+  extractedSkills: string[]
+  extractedTraits: string[]
+  summary: string
+}
+
 export interface PersonalityProfile {
   name: string
   bio: string
+  avatarUrl?: string | null
   skills: string[]
   interests: string[]
   values: string[]
@@ -11,6 +29,24 @@ export interface PersonalityProfile {
     tone: string
   }
   trainingMessages: { role: 'user' | 'elit'; content: string }[]
+  // Phase 2: Enhanced personality data
+  knowledgeGraph: KnowledgeEntry[]
+  personalityTraits: {
+    openness: number       // 0-100
+    conscientiousness: number
+    extraversion: number
+    agreeableness: number
+    neuroticism: number
+  }
+  trainingSessions: TrainingSession[]
+  writingStyle: {
+    avgSentenceLength: 'short' | 'medium' | 'long'
+    vocabulary: 'simple' | 'moderate' | 'sophisticated'
+    usesEmoji: boolean
+    usesSlang: boolean
+    favoriteExpressions: string[]
+  }
+  totalTrainingMinutes: number
 }
 
 export function generateSystemPrompt(profile: PersonalityProfile): string {
@@ -25,9 +61,16 @@ export function generateSystemPrompt(profile: PersonalityProfile): string {
     profile.communicationStyle.tone ? `Tone: ${profile.communicationStyle.tone}` : '',
   ].filter(Boolean).join('. ')
 
-  // Extract personality insights from training conversations
+  const knowledgeStr = profile.knowledgeGraph?.length > 0
+    ? `\nKnowledge Areas:\n${profile.knowledgeGraph.map(k => `- ${k.topic} (${k.expertiseLevel}): ${k.details.join(', ')}`).join('\n')}`
+    : ''
+
+  const traitsStr = profile.personalityTraits
+    ? `\nPersonality: Openness ${profile.personalityTraits.openness}%, Conscientiousness ${profile.personalityTraits.conscientiousness}%, Extraversion ${profile.personalityTraits.extraversion}%, Agreeableness ${profile.personalityTraits.agreeableness}%`
+    : ''
+
   const trainingContext = profile.trainingMessages.length > 0
-    ? `\n\nTraining conversation context (use this to understand the person deeply):\n${
+    ? `\n\nTraining conversation context:\n${
         profile.trainingMessages.slice(-20).map(m => `${m.role === 'user' ? 'Human' : 'Elit'}: ${m.content}`).join('\n')
       }`
     : ''
@@ -38,7 +81,7 @@ Bio: ${profile.bio}
 ${skillsStr}
 ${interestsStr}
 ${valuesStr}
-${styleDesc}
+${styleDesc}${knowledgeStr}${traitsStr}
 
 IMPORTANT RULES:
 - You ARE ${profile.name}. Respond in first person as them.
@@ -62,6 +105,7 @@ export function createEmptyProfile(): PersonalityProfile {
   return {
     name: '',
     bio: '',
+    avatarUrl: null,
     skills: [],
     interests: [],
     values: [],
@@ -72,10 +116,67 @@ export function createEmptyProfile(): PersonalityProfile {
       tone: '',
     },
     trainingMessages: [],
+    knowledgeGraph: [],
+    personalityTraits: {
+      openness: 50,
+      conscientiousness: 50,
+      extraversion: 50,
+      agreeableness: 50,
+      neuroticism: 50,
+    },
+    trainingSessions: [],
+    writingStyle: {
+      avgSentenceLength: 'medium',
+      vocabulary: 'moderate',
+      usesEmoji: false,
+      usesSlang: false,
+      favoriteExpressions: [],
+    },
+    totalTrainingMinutes: 0,
   }
 }
 
-// Training prompts that the Elit trainer asks to learn about the user
+export function addTrainingSession(
+  profile: PersonalityProfile,
+  session: Omit<TrainingSession, 'id' | 'date'>
+): PersonalityProfile {
+  return {
+    ...profile,
+    trainingSessions: [
+      ...profile.trainingSessions,
+      {
+        ...session,
+        id: `session-${Date.now()}`,
+        date: new Date().toISOString(),
+      },
+    ],
+  }
+}
+
+export function updateKnowledgeGraph(
+  profile: PersonalityProfile,
+  topic: string,
+  level: KnowledgeEntry['expertiseLevel'],
+  details: string[]
+): PersonalityProfile {
+  const existing = profile.knowledgeGraph.findIndex(k => k.topic.toLowerCase() === topic.toLowerCase())
+  const newGraph = [...profile.knowledgeGraph]
+  
+  if (existing >= 0) {
+    newGraph[existing] = {
+      ...newGraph[existing],
+      expertiseLevel: level,
+      details: [...new Set([...newGraph[existing].details, ...details])],
+      lastUpdated: new Date().toISOString(),
+    }
+  } else {
+    newGraph.push({ topic, expertiseLevel: level, details, lastUpdated: new Date().toISOString() })
+  }
+  
+  return { ...profile, knowledgeGraph: newGraph }
+}
+
+// Training prompts
 export const trainingPrompts = [
   "Hey! I'm your Elit — your AI clone in training. Let's start with the basics. Tell me about yourself. What do you do? What are you passionate about?",
   "What are your top skills and areas of expertise? What would people come to you for advice about?",

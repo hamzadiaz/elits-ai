@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { generatePersonalityHash, createEmptyProfile, type PersonalityProfile } from '@/lib/personality'
-import { User, Sparkles, ChevronLeft, ChevronRight, Check, Wallet, Upload, Zap, Heart, MessageSquare } from 'lucide-react'
+import { Avatar3D } from '@/components/Avatar3D'
+import { User, Sparkles, ChevronLeft, ChevronRight, Check, Wallet, Upload, Zap, Heart, MessageSquare, Loader2 } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -87,12 +88,50 @@ export default function CreateElitPage() {
   const [profile, setProfile] = useState<PersonalityProfile>(createEmptyProfile())
   const [creating, setCreating] = useState(false)
   const [hash, setHash] = useState('')
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [generatingAvatar, setGeneratingAvatar] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const toggleTag = (field: 'skills' | 'interests' | 'values', tag: string) => {
     setProfile(p => ({
       ...p,
       [field]: p[field].includes(tag) ? p[field].filter(t => t !== tag) : [...p[field], tag],
     }))
+  }
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Show preview immediately
+    const reader = new FileReader()
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target?.result as string
+      setAvatarPreview(dataUrl)
+
+      // Try to generate avatar via Gemini
+      setGeneratingAvatar(true)
+      try {
+        const base64 = dataUrl.split(',')[1]
+        const res = await fetch('/api/avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64, mimeType: file.type }),
+        })
+        const data = await res.json()
+        if (data.avatarUrl) {
+          setAvatarPreview(data.avatarUrl)
+          setProfile(p => ({ ...p, avatarUrl: data.avatarUrl }))
+        }
+      } catch (err) {
+        console.error('Avatar generation failed:', err)
+        // Keep original preview
+        setProfile(p => ({ ...p, avatarUrl: dataUrl }))
+      } finally {
+        setGeneratingAvatar(false)
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleCreate = async () => {
@@ -113,12 +152,7 @@ export default function CreateElitPage() {
   if (!connected) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-md"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center max-w-md">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-blue/20 border border-white/[0.08] flex items-center justify-center mx-auto mb-8">
             <Wallet className="w-8 h-8 text-primary-light" />
           </div>
@@ -128,12 +162,7 @@ export default function CreateElitPage() {
           </p>
           <WalletMultiButton style={{
             background: 'linear-gradient(135deg, #7c3aed, #3b82f6)',
-            borderRadius: '14px',
-            fontSize: '15px',
-            fontWeight: '600',
-            height: '48px',
-            padding: '0 28px',
-            border: 'none',
+            borderRadius: '14px', fontSize: '15px', fontWeight: '600', height: '48px', padding: '0 28px', border: 'none',
             boxShadow: '0 0 30px rgba(124, 58, 237, 0.2)',
           }} />
         </motion.div>
@@ -142,7 +171,7 @@ export default function CreateElitPage() {
   }
 
   const steps = [
-    // Step 0: Name & Bio
+    // Step 0: Name & Bio & Photo
     <motion.div key="basics" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.4 }}>
       <h2 className="text-2xl font-bold gradient-text-white mb-1">Who Are You?</h2>
       <p className="text-gray-600 text-sm mb-8">Let&apos;s start with the basics.</p>
@@ -166,14 +195,44 @@ export default function CreateElitPage() {
             className="w-full px-5 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder-gray-600 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all resize-none text-base"
           />
         </div>
-        {/* Avatar upload area */}
+        {/* Avatar upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">Avatar</label>
-          <div className="border-2 border-dashed border-white/[0.06] rounded-2xl p-8 text-center hover:border-primary/30 transition-colors cursor-pointer group">
-            <Upload className="w-8 h-8 text-gray-600 mx-auto mb-3 group-hover:text-primary/60 transition-colors" />
-            <p className="text-sm text-gray-600">Drag & drop or click to upload</p>
-            <p className="text-xs text-gray-700 mt-1">PNG, JPG up to 5MB</p>
-          </div>
+          <label className="block text-sm font-medium text-gray-400 mb-2">Profile Photo → 3D Avatar</label>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+          
+          {avatarPreview ? (
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <Avatar3D avatarUrl={avatarPreview} name={profile.name || '?'} size="lg" state={generatingAvatar ? 'thinking' : 'idle'} />
+                {generatingAvatar && (
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 border border-primary/30">
+                    <Loader2 className="w-3 h-3 text-primary-light animate-spin" />
+                    <span className="text-[10px] text-primary-light">Generating avatar...</span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-gray-400 mb-2">
+                  {generatingAvatar ? 'Creating your AI avatar...' : 'Your AI Avatar'}
+                </p>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs text-primary-light hover:text-primary transition-colors"
+                >
+                  Change photo
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-white/[0.06] rounded-2xl p-8 text-center hover:border-primary/30 transition-colors cursor-pointer group"
+            >
+              <Upload className="w-8 h-8 text-gray-600 mx-auto mb-3 group-hover:text-primary/60 transition-colors" />
+              <p className="text-sm text-gray-600">Upload a photo to generate your 3D avatar</p>
+              <p className="text-xs text-gray-700 mt-1">PNG, JPG up to 5MB • AI will transform it</p>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>,
@@ -235,9 +294,7 @@ export default function CreateElitPage() {
       <p className="text-gray-600 text-sm mb-8">Everything look right? Let&apos;s bring it to life.</p>
       <div className="gradient-border rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-dark to-blue flex items-center justify-center text-xl font-bold text-white">
-            {profile.name?.charAt(0)?.toUpperCase() || '?'}
-          </div>
+          <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="md" />
           <div>
             <p className="text-white font-semibold text-lg">{profile.name || 'Unnamed'}</p>
             <p className="text-gray-500 text-sm font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}</p>
@@ -272,9 +329,9 @@ export default function CreateElitPage() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', bounce: 0.5, delay: 0.2 }}
-        className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400/20 to-emerald-500/20 border border-green-400/30 flex items-center justify-center mx-auto mb-6"
+        className="mb-6"
       >
-        <Check className="w-8 h-8 text-green-400" />
+        <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="xl" state="speaking" />
       </motion.div>
       <h2 className="text-3xl font-bold gradient-text-white mb-3">Elit Created!</h2>
       <p className="text-gray-500 mb-6 text-sm">Your personality hash has been generated. Now train your Elit to make it truly you.</p>
@@ -303,52 +360,35 @@ export default function CreateElitPage() {
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
-        {/* Progress indicator */}
         {step < 4 && (
           <div className="flex items-center gap-3 mb-10">
             {stepInfo.map((s, i) => (
               <div key={i} className="flex items-center gap-3 flex-1">
-                <div className={`flex items-center gap-2 transition-all duration-300 ${
-                  i <= step ? 'opacity-100' : 'opacity-30'
-                }`}>
+                <div className={`flex items-center gap-2 transition-all duration-300 ${i <= step ? 'opacity-100' : 'opacity-30'}`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                    i < step
-                      ? 'bg-primary/20 border border-primary/40'
-                      : i === step
-                        ? 'bg-gradient-to-br from-primary-dark to-blue shadow-[0_0_20px_rgba(124,58,237,0.2)]'
+                    i < step ? 'bg-primary/20 border border-primary/40'
+                      : i === step ? 'bg-gradient-to-br from-primary-dark to-blue shadow-[0_0_20px_rgba(124,58,237,0.2)]'
                         : 'bg-white/[0.03] border border-white/[0.06]'
                   }`}>
-                    {i < step ? (
-                      <Check className="w-3.5 h-3.5 text-primary-light" />
-                    ) : (
-                      <s.icon className="w-3.5 h-3.5 text-white/70" />
-                    )}
+                    {i < step ? <Check className="w-3.5 h-3.5 text-primary-light" /> : <s.icon className="w-3.5 h-3.5 text-white/70" />}
                   </div>
                   <span className="text-xs text-gray-500 hidden sm:block">{s.label}</span>
                 </div>
-                {i < 3 && (
-                  <div className={`flex-1 h-px transition-all duration-300 ${
-                    i < step ? 'bg-primary/40' : 'bg-white/[0.04]'
-                  }`} />
-                )}
+                {i < 3 && <div className={`flex-1 h-px transition-all duration-300 ${i < step ? 'bg-primary/40' : 'bg-white/[0.04]'}`} />}
               </div>
             ))}
           </div>
         )}
 
-        <AnimatePresence mode="wait">
-          {steps[step]}
-        </AnimatePresence>
+        <AnimatePresence mode="wait">{steps[step]}</AnimatePresence>
 
-        {/* Navigation */}
         {step < 4 && (
           <div className="flex justify-between mt-10">
             <button
               onClick={() => setStep(s => Math.max(0, s - 1))}
               className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/[0.06] bg-white/[0.02] text-gray-500 hover:text-white hover:border-white/[0.12] transition-all ${step === 0 ? 'invisible' : ''}`}
             >
-              <ChevronLeft className="w-4 h-4" />
-              Back
+              <ChevronLeft className="w-4 h-4" /> Back
             </button>
             {step < 3 ? (
               <button
@@ -356,8 +396,7 @@ export default function CreateElitPage() {
                 disabled={step === 0 && !profile.name}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-dark to-blue text-white font-semibold disabled:opacity-30 hover:scale-[1.02] transition-transform"
               >
-                Continue
-                <ChevronRight className="w-4 h-4" />
+                Continue <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
@@ -366,15 +405,9 @@ export default function CreateElitPage() {
                 className="group inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary-dark via-primary to-blue text-white font-bold btn-glow hover:scale-[1.02] transition-transform disabled:opacity-50"
               >
                 {creating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Creating...
-                  </>
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Creating...</>
                 ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Create Elit
-                  </>
+                  <><Sparkles className="w-4 h-4" /> Create Elit</>
                 )}
               </button>
             )}
