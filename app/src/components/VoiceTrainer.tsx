@@ -161,7 +161,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-8">
           <Avatar3D avatarUrl={avatarUrl} name={elitName} size="xl" state="idle" />
           <h3 className="text-xl font-bold gradient-text-white mt-6 mb-2">Call Your Elit</h3>
-          <p className="text-gray-500 text-sm mb-6 text-center max-w-xs">
+          <p className="text-white/35 text-[13px] mb-6 text-center max-w-xs font-light leading-relaxed">
             Have a voice conversation to teach your Elit who you are. The more you talk, the better it knows you.
           </p>
           <motion.button
@@ -171,7 +171,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
           >
             <Phone className="w-7 h-7 text-white" />
           </motion.button>
-          <p className="text-xs text-gray-600 mt-3">Tap to start voice training</p>
+          <p className="text-[11px] text-white/20 mt-3">Tap to start voice training</p>
         </motion.div>
       )}
 
@@ -179,7 +179,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
       {connectionState === 'connecting' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-12">
           <Avatar3D avatarUrl={avatarUrl} name={elitName} size="xl" state="thinking" />
-          <p className="text-sm text-gray-400 mt-6">Connecting...</p>
+          <p className="text-[13px] text-white/35 mt-6 font-light">Connecting...</p>
         </motion.div>
       )}
 
@@ -187,7 +187,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
       {isActive && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center w-full">
           {/* Timer */}
-          <p className="text-sm font-mono text-gray-500 mb-4">{formatTime(callDuration)}</p>
+          <p className="text-[13px] font-mono text-white/30 mb-4">{formatTime(callDuration)}</p>
 
           {/* Avatar */}
           <Avatar3D avatarUrl={avatarUrl} name={elitName} size="xl" state={avatarState} />
@@ -199,7 +199,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="text-xs text-gray-500 mt-4"
+              className="text-[11px] text-white/30 mt-4 font-light"
             >
               {isAiSpeaking ? `${elitName}'s Elit is speaking...` : isUserSpeaking ? 'Listening to you...' : 'Listening...'}
             </motion.p>
@@ -208,15 +208,15 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
           {/* Transcript */}
           <div className="w-full mt-6 h-40 overflow-y-auto rounded-xl bg-white/[0.02] border border-white/[0.08] p-3">
             {transcript.length === 0 ? (
-              <p className="text-xs text-gray-600 text-center mt-12">Conversation will appear here...</p>
+              <p className="text-[11px] text-white/20 text-center mt-12 font-light">Conversation will appear here...</p>
             ) : (
               <div className="space-y-2">
                 {transcript.map(entry => (
                   <div key={entry.id} className={`flex gap-2 ${entry.speaker === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] px-3 py-1.5 rounded-xl text-xs ${
-                      entry.speaker === 'user' ? 'bg-primary/20 text-gray-300' : 'bg-white/[0.04] text-gray-400'
+                    <div className={`max-w-[80%] px-3 py-1.5 rounded-xl text-[11px] ${
+                      entry.speaker === 'user' ? 'bg-amber-500/[0.06] border border-amber-500/20 text-white/50' : 'bg-white/[0.04] border border-white/[0.06] text-white/35'
                     }`}>
-                      <span className="font-medium text-[10px] block mb-0.5 opacity-60">
+                      <span className="font-medium text-[9px] block mb-0.5 text-white/25 uppercase tracking-wider">
                         {entry.speaker === 'user' ? 'You' : 'Elit'}
                       </span>
                       {entry.text}
@@ -233,8 +233,8 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={toggleMute}
-              className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
-                isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/[0.03] border border-white/[0.06] text-gray-400 hover:text-white'
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                isMuted ? 'bg-red-500/[0.1] text-red-400/60 border border-red-500/20' : 'bg-white/[0.03] border border-white/[0.06] text-white/35 hover:text-white/60'
               }`}
             >
               {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -253,9 +253,9 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
       {/* Error */}
       {connectionState === 'error' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-8">
-          <PhoneOff className="w-10 h-10 text-red-400 mb-4" />
-          <p className="text-sm text-gray-400 mb-4">Connection failed. Check your microphone permissions.</p>
-          <button onClick={connect} className="px-6 py-2 rounded-xl bg-primary/20 text-primary-light text-sm font-medium border border-primary/30 hover:bg-primary/30 transition-colors">
+          <PhoneOff className="w-10 h-10 text-red-400/50 mb-4" />
+          <p className="text-[13px] text-white/35 mb-4 font-light">Connection failed. Check your microphone permissions.</p>
+          <button onClick={connect} className="px-6 py-2.5 rounded-xl bg-amber-500/[0.08] text-amber-300/60 text-[12px] font-medium border border-amber-500/20 hover:bg-amber-500/[0.12] transition-colors cursor-pointer">
             Try Again
           </button>
         </motion.div>

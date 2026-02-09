@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { generatePersonalityHash, createEmptyProfile, type PersonalityProfile } from '@/lib/personality'
 import { Avatar3D } from '@/components/Avatar3D'
 import { getConnection, getProvider, getProgram, createElitOnChain, explorerUrl } from '@/lib/solana'
+import { useToast } from '@/components/Toast'
 import { User, Sparkles, ChevronLeft, ChevronRight, Check, Wallet, Upload, Zap, Heart, MessageSquare, Loader2, ExternalLink } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
@@ -80,6 +81,7 @@ const stepInfo = [
 export default function CreateElitPage() {
   const { connected, publicKey, signTransaction, signAllTransactions } = useWallet()
   const router = useRouter()
+  const { addToast, updateToast } = useToast()
   const [step, setStep] = useState(0)
   const [profile, setProfile] = useState<PersonalityProfile>(() => {
     // Check for template pre-fill from Explore page
@@ -151,6 +153,7 @@ export default function CreateElitPage() {
 
       // Send on-chain transaction
       if (publicKey && signTransaction && signAllTransactions) {
+        const toastId = addToast({ type: 'loading', message: 'Registering Elit on Solana...', duration: 0 })
         try {
           const connection = getConnection()
           const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
@@ -165,13 +168,16 @@ export default function CreateElitPage() {
           )
           setTxSignature(sig)
           localStorage.setItem('elitTxSignature', sig)
+          updateToast(toastId, { type: 'success', message: 'Elit registered on-chain!', txSignature: sig })
         } catch (err: unknown) {
           console.error('On-chain creation failed:', err)
           const msg = err instanceof Error ? err.message : String(err)
           if (msg.includes('already in use')) {
             setTxError('Elit already exists on-chain for this wallet!')
+            updateToast(toastId, { type: 'error', message: 'Elit already exists for this wallet' })
           } else {
             setTxError(`On-chain tx failed: ${msg.slice(0, 120)}`)
+            updateToast(toastId, { type: 'error', message: 'On-chain registration failed' })
           }
         }
       }

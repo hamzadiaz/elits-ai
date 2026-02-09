@@ -16,6 +16,7 @@ import {
 import { XPBar } from '@/components/XPBar'
 import { LevelBadge } from '@/components/LevelBadge'
 import { CapabilityChart } from '@/components/CapabilityChart'
+import { useToast } from '@/components/Toast'
 import { calculateXP, calculateCapabilities, getUnlockedMilestones, type AgentStats } from '@/lib/xp'
 
 const WalletMultiButton = dynamic(
@@ -66,6 +67,7 @@ export default function DashboardPage() {
   const [lastTxSig, setLastTxSig] = useState('')
   const [txError, setTxError] = useState('')
 
+  const { addToast, updateToast } = useToast()
   const [agentXP, setAgentXP] = useState(0)
   const [capabilities, setCapabilities] = useState<AgentStats['capabilities']>({ knowledge: 0, communication: 0, actions: 0, trust: 0, creativity: 0 })
   const [milestones, setMilestones] = useState<ReturnType<typeof getUnlockedMilestones>>([])
@@ -125,6 +127,7 @@ export default function DashboardPage() {
 
     // Try on-chain delegation
     if (publicKey && signTransaction && signAllTransactions) {
+      const toastId = addToast({ type: 'loading', message: 'Creating delegation on Solana...', duration: 0 })
       try {
         const connection = getConnection()
         const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
@@ -135,9 +138,11 @@ export default function DashboardPage() {
         const sig = await delegateOnChain(program, publicKey, delegateAddr, newScopes.join(','), expiresAt, newRestrictions)
         setLastTxSig(sig)
         del.id = sig.slice(0, 12)
+        updateToast(toastId, { type: 'success', message: 'Delegation created on-chain!', txSignature: sig })
       } catch (err) {
         console.error('On-chain delegation failed:', err)
         setTxError('On-chain delegation failed. Saved locally.')
+        updateToast(toastId, { type: 'error', message: 'On-chain delegation failed' })
       }
     }
 
@@ -151,15 +156,18 @@ export default function DashboardPage() {
     setTxError('')
 
     if (publicKey && signTransaction && signAllTransactions) {
+      const toastId = addToast({ type: 'loading', message: 'Revoking Elit on Solana...', duration: 0 })
       try {
         const connection = getConnection()
         const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
         const program = getProgram(provider)
         const sig = await revokeElitOnChain(program, publicKey)
         setLastTxSig(sig)
+        updateToast(toastId, { type: 'success', message: 'Elit revoked on-chain', txSignature: sig })
       } catch (err) {
         console.error('On-chain revoke failed:', err)
         setTxError('On-chain revoke failed.')
+        updateToast(toastId, { type: 'error', message: 'On-chain revoke failed' })
       }
     }
 
@@ -299,7 +307,7 @@ export default function DashboardPage() {
                 )}
 
                 {/* Quick actions */}
-                <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                   {[
                     { href: '/train', icon: Mic, title: 'Train', desc: 'Chat or voice' },
                     { href: '/chat/default', icon: MessageSquare, title: 'Chat', desc: 'Test your agent' },

@@ -376,6 +376,15 @@ body {
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
+/* ──── SCROLLBAR HIDE ──── */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* ──── SELECTION ──── */
 ::selection {
   background: rgba(212, 160, 23, 0.3);

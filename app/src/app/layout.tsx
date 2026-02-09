@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { WalletProviderWrapper } from '@/components/WalletProvider'
 import { Navbar } from '@/components/Navbar'
+import { ToastProvider } from '@/components/Toast'
 
 export const metadata: Metadata = {
   title: 'Elits AI — Verified AI Agents on Solana',
@@ -46,10 +47,12 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="bg-surface min-h-screen bg-grid antialiased">
         <WalletProviderWrapper>
-          <Navbar />
-          <main className="pt-16">
-            {children}
-          </main>
+          <ToastProvider>
+            <Navbar />
+            <main className="pt-16">
+              {children}
+            </main>
+          </ToastProvider>
         </WalletProviderWrapper>
       </body>
     </html>

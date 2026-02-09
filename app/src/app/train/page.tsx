@@ -252,6 +252,27 @@ export default function TrainPage() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
+        {/* Mobile mode toggle — visible only on small screens */}
+        <div className="lg:hidden flex items-center gap-2 px-4 pt-4 pb-2">
+          <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="sm" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-medium text-white/70 truncate">{profile.name}</p>
+            <p className="text-[10px] text-white/30">Training · {messages.length + profile.trainingMessages.length} messages</p>
+          </div>
+          <div className="flex gap-1.5">
+            {[
+              { m: 'chat' as TrainingMode, icon: MessageSquare, label: 'Chat' },
+              { m: 'voice' as TrainingMode, icon: Phone, label: 'Voice' },
+            ].map(item => (
+              <button key={item.m} onClick={() => setMode(item.m)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                  mode === item.m ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.04] text-white/35 border border-white/[0.06]'
+                }`}>
+                <item.icon className="w-3 h-3" /> {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
         {mode === 'voice' ? (
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="w-full max-w-md">
