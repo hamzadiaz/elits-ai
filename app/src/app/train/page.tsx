@@ -120,7 +120,7 @@ export default function TrainPage() {
             <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Connect to Train</h1>
-          <p className="text-white/20 mb-8 text-[13px] font-light">Connect your wallet and create an Elit first.</p>
+          <p className="text-white/45 mb-8 text-[13px] font-light">Connect your wallet and create an Elit first.</p>
           <WalletMultiButton style={{ background: 'rgba(212, 160, 23, 0.15)', border: '0.5px solid rgba(212, 160, 23, 0.25)', borderRadius: '14px', fontSize: '13px', fontWeight: '500', height: '44px', color: '#f0c940' }} />
         </motion.div>
       </div>
@@ -135,7 +135,7 @@ export default function TrainPage() {
             <Brain className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Create Your Elit First</h1>
-          <p className="text-white/20 mb-8 text-[13px] font-light">You need to create an Elit before training.</p>
+          <p className="text-white/45 mb-8 text-[13px] font-light">You need to create an Elit before training.</p>
           <a href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all">
             Create Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
           </a>
@@ -154,13 +154,13 @@ export default function TrainPage() {
           <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="sm" />
           <div>
             <p className="text-[13px] font-medium text-white/70">{profile.name}</p>
-            <p className="text-[11px] text-white/15">Training Session</p>
+            <p className="text-[11px] text-white/40">Training Session</p>
           </div>
         </div>
 
         {/* Mode toggle */}
         <div className="mb-6">
-          <p className="text-[10px] text-white/15 uppercase tracking-wider font-medium mb-3">Training Mode</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-medium mb-3">Training Mode</p>
           <div className="grid grid-cols-2 gap-2">
             {[
               { mode: 'chat' as TrainingMode, icon: MessageSquare, label: 'Chat' },
@@ -168,7 +168,7 @@ export default function TrainPage() {
             ].map(m => (
               <button key={m.mode} onClick={() => setMode(m.mode)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[12px] transition-all duration-300 cursor-pointer ${
-                  mode === m.mode ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.015] text-white/20 border border-white/[0.06] hover:border-white/[0.06]'
+                  mode === m.mode ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.015] text-white/45 border border-white/[0.06] hover:border-white/[0.06]'
                 }`}>
                 <m.icon className="w-3.5 h-3.5" /> {m.label}
               </button>
@@ -177,7 +177,7 @@ export default function TrainPage() {
         </div>
 
         <div className="space-y-4 mb-8">
-          <p className="text-[10px] text-white/15 uppercase tracking-wider font-medium">Progress</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-medium">Progress</p>
           <div className="elite-card rounded-xl p-4 space-y-3">
             {[
               { icon: MessageSquare, label: 'Messages', value: profile.trainingMessages.length + messages.length, color: 'text-amber-300/40' },
@@ -186,7 +186,7 @@ export default function TrainPage() {
             ].map(s => (
               <div key={s.label} className="flex items-center gap-3">
                 <s.icon className={`w-3.5 h-3.5 ${s.color}`} />
-                <span className="text-[12px] text-white/20 font-light">{s.label}</span>
+                <span className="text-[12px] text-white/45 font-light">{s.label}</span>
                 <span className="ml-auto text-[12px] font-medium text-white/50">{s.value}</span>
               </div>
             ))}
@@ -194,7 +194,7 @@ export default function TrainPage() {
 
           {mode === 'chat' && (
             <div>
-              <div className="flex justify-between text-[10px] text-white/15 mb-1.5">
+              <div className="flex justify-between text-[10px] text-white/40 mb-1.5">
                 <span>Session Progress</span>
                 <span>{Math.min(100, Math.round(userMsgCount / 6 * 100))}%</span>
               </div>
@@ -209,7 +209,7 @@ export default function TrainPage() {
 
         {profile.skills.length > 0 && (
           <div>
-            <p className="text-[10px] text-white/15 uppercase tracking-wider font-medium mb-3">Detected Skills</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-medium mb-3">Detected Skills</p>
             <div className="flex flex-wrap gap-1">
               {profile.skills.slice(0, 8).map(s => <span key={s} className="elite-tag text-[10px]">{s}</span>)}
             </div>

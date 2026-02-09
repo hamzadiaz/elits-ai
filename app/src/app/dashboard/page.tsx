@@ -7,10 +7,11 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { type PersonalityProfile } from '@/lib/personality'
 import { Avatar3D } from '@/components/Avatar3D'
+import { getConnection, getProvider, getProgram, delegateOnChain, revokeElitOnChain, explorerUrl, PublicKey } from '@/lib/solana'
 import {
   Wallet, Zap, MessageSquare, ShieldCheck, Mic, Brain, ChevronRight,
   Activity, Clock, Twitter, Code, Mail, Search,
-  Play, CheckCircle, XCircle, Shield, Plus, Eye, Power
+  Play, CheckCircle, XCircle, Shield, Plus, Eye, Power, ExternalLink, Loader2
 } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
@@ -40,7 +41,7 @@ const ACTION_LABELS: Record<ActionType, string> = {
 }
 
 export default function DashboardPage() {
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, signTransaction, signAllTransactions } = useWallet()
   const [profile, setProfile] = useState<PersonalityProfile | null>(null)
   const [hash, setHash] = useState('')
   const [tab, setTab] = useState<'overview' | 'actions' | 'delegations'>('overview')
@@ -57,6 +58,9 @@ export default function DashboardPage() {
   const [newExpiry, setNewExpiry] = useState('7')
   const [newRestrictions, setNewRestrictions] = useState('')
   const [killSwitchConfirm, setKillSwitchConfirm] = useState(false)
+  const [txPending, setTxPending] = useState(false)
+  const [lastTxSig, setLastTxSig] = useState('')
+  const [txError, setTxError] = useState('')
 
   useEffect(() => {
     const stored = localStorage.getItem('elitProfile')
@@ -88,20 +92,59 @@ export default function DashboardPage() {
 
   const revokeDelegation = (id: string) => setDelegations(prev => prev.map(d => d.id === id ? { ...d, active: false } : d))
 
-  const createDelegation = () => {
+  const createDelegation = async () => {
     if (newScopes.length === 0) return
+    setTxPending(true)
+    setTxError('')
     const del: Delegation = {
       id: `del-${Date.now()}`, scopes: newScopes,
       expiresAt: new Date(Date.now() + parseInt(newExpiry) * 86400000).toISOString(),
       restrictions: newRestrictions, active: true, createdAt: new Date().toISOString(),
     }
+
+    // Try on-chain delegation
+    if (publicKey && signTransaction && signAllTransactions) {
+      try {
+        const connection = getConnection()
+        const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
+        const program = getProgram(provider)
+        // Use a deterministic delegate address (self-delegation for demo)
+        const delegateAddr = PublicKey.unique()
+        const expiresAt = Math.floor(Date.now() / 1000) + parseInt(newExpiry) * 86400
+        const sig = await delegateOnChain(program, publicKey, delegateAddr, newScopes.join(','), expiresAt, newRestrictions)
+        setLastTxSig(sig)
+        del.id = sig.slice(0, 12)
+      } catch (err) {
+        console.error('On-chain delegation failed:', err)
+        setTxError('On-chain delegation failed. Saved locally.')
+      }
+    }
+
     setDelegations(prev => [del, ...prev])
     setShowNewDelegation(false); setNewScopes([]); setNewRestrictions('')
+    setTxPending(false)
   }
 
-  const killSwitch = () => {
+  const killSwitch = async () => {
+    setTxPending(true)
+    setTxError('')
+
+    if (publicKey && signTransaction && signAllTransactions) {
+      try {
+        const connection = getConnection()
+        const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
+        const program = getProgram(provider)
+        const sig = await revokeElitOnChain(program, publicKey)
+        setLastTxSig(sig)
+      } catch (err) {
+        console.error('On-chain revoke failed:', err)
+        setTxError('On-chain revoke failed.')
+      }
+    }
+
     setDelegations(prev => prev.map(d => ({ ...d, active: false })))
     setKillSwitchConfirm(false)
+    setTxPending(false)
   }
 
   if (!connected) {
@@ -112,7 +155,7 @@ export default function DashboardPage() {
             <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Dashboard</h1>
-          <p className="text-white/20 mb-8 text-[13px] font-light">Connect your wallet to manage your Elit.</p>
+          <p className="text-white/45 mb-8 text-[13px] font-light">Connect your wallet to manage your Elit.</p>
           <WalletMultiButton style={{ background: 'rgba(212, 160, 23, 0.15)', border: '0.5px solid rgba(212, 160, 23, 0.25)', borderRadius: '14px', fontSize: '13px', fontWeight: '500', height: '44px', color: '#f0c940' }} />
         </motion.div>
       </div>
@@ -124,7 +167,7 @@ export default function DashboardPage() {
       <motion.div initial="initial" animate="animate" transition={{ staggerChildren: 0.05 }}>
         <motion.div variants={fadeUp} className="mb-6">
           <h1 className="text-xl font-bold gradient-text-white mb-1">Dashboard</h1>
-          <p className="text-white/15 text-[13px] font-light">Manage your Elit, execute actions, and control delegations.</p>
+          <p className="text-white/40 text-[13px] font-light">Manage your Elit, execute actions, and control delegations.</p>
         </motion.div>
 
         {/* Tabs */}
@@ -132,7 +175,7 @@ export default function DashboardPage() {
           {(['overview', 'actions', 'delegations'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-[11px] font-medium transition-all duration-300 capitalize cursor-pointer ${
-                tab === t ? 'bg-amber-500/[0.1] text-amber-300/70 border border-amber-500/25' : 'text-white/20 hover:text-white/35'
+                tab === t ? 'bg-amber-500/[0.1] text-amber-300/70 border border-amber-500/25' : 'text-white/45 hover:text-white/35'
               }`}
             >{t}</button>
           ))}
@@ -148,7 +191,7 @@ export default function DashboardPage() {
                     <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
                     <div className="flex-1 min-w-0">
                       <h2 className="text-base font-semibold text-white/90">{profile.name}&apos;s Elit</h2>
-                      <p className="text-[13px] text-white/20 mt-0.5 line-clamp-1 font-light">{profile.bio}</p>
+                      <p className="text-[13px] text-white/45 mt-0.5 line-clamp-1 font-light">{profile.bio}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="relative flex h-1.5 w-1.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/60 opacity-75" />
@@ -156,7 +199,7 @@ export default function DashboardPage() {
                         </span>
                         <span className="text-[11px] text-emerald-400/60 font-medium">Active</span>
                         <span className="text-[11px] text-white/10">·</span>
-                        <span className="text-[11px] text-white/15 font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-4)}</span>
+                        <span className="text-[11px] text-white/40 font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-4)}</span>
                       </div>
                     </div>
                   </div>
@@ -170,7 +213,7 @@ export default function DashboardPage() {
                       <div key={stat.label} className="rounded-xl bg-white/[0.015] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
                         <stat.icon className={`w-4 h-4 ${stat.color} mb-3`} />
                         <div className="text-lg font-bold text-white/80">{stat.value}</div>
-                        <div className="text-[10px] text-white/15 uppercase tracking-wider">{stat.label}</div>
+                        <div className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -201,7 +244,7 @@ export default function DashboardPage() {
                         <action.icon className="w-3.5 h-3.5 text-amber-300/40" />
                       </div>
                       <h3 className="font-medium text-white/70 text-[13px] mb-0.5 group-hover:text-white/90 transition-colors duration-500">{action.title}</h3>
-                      <p className="text-[11px] text-white/15 font-light">{action.desc}</p>
+                      <p className="text-[11px] text-white/40 font-light">{action.desc}</p>
                     </Link>
                   ))}
                 </motion.div>
@@ -248,7 +291,7 @@ export default function DashboardPage() {
                           className={`flex items-center gap-2 p-3 rounded-xl border text-[11px] font-medium transition-all duration-300 cursor-pointer ${
                             actionType === type
                               ? 'border-amber-500/25 bg-amber-500/[0.06] text-amber-300/60'
-                              : 'border-white/[0.06] bg-white/[0.01] text-white/20 hover:border-white/[0.06]'
+                              : 'border-white/[0.06] bg-white/[0.01] text-white/45 hover:border-white/[0.06]'
                           }`}
                         >
                           <Icon className="w-3 h-3" /> {ACTION_LABELS[type]}
@@ -271,7 +314,7 @@ export default function DashboardPage() {
                     <Clock className="w-3.5 h-3.5 text-amber-300/30" /> Action History
                   </h3>
                   {actions.length === 0 ? (
-                    <p className="text-center text-white/15 text-[13px] py-8 font-light">No actions yet.</p>
+                    <p className="text-center text-white/40 text-[13px] py-8 font-light">No actions yet.</p>
                   ) : (
                     <div className="space-y-3">
                       {actions.map(action => {
@@ -282,7 +325,7 @@ export default function DashboardPage() {
                               <Icon className="w-3.5 h-3.5 text-amber-300/30" />
                               <div className="flex-1 min-w-0">
                                 <span className="text-[11px] font-medium text-white/50">{ACTION_LABELS[action.type]}</span>
-                                <p className="text-[11px] text-white/15 truncate font-light">{action.prompt}</p>
+                                <p className="text-[11px] text-white/40 truncate font-light">{action.prompt}</p>
                               </div>
                               <div className="flex items-center gap-1.5">
                                 {action.status === 'completed' ? <CheckCircle className="w-3 h-3 text-emerald-400/40" /> : action.status === 'failed' ? <XCircle className="w-3 h-3 text-red-400/40" /> : <div className="w-3 h-3 border-2 border-amber-400/30 border-t-amber-400/60 rounded-full animate-spin" />}
@@ -316,24 +359,24 @@ export default function DashboardPage() {
                       <h3 className="text-[13px] font-medium text-white/60 mb-4">Create Delegation</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="text-[10px] text-white/15 mb-2 block uppercase tracking-wider">Scopes</label>
+                          <label className="text-[10px] text-white/40 mb-2 block uppercase tracking-wider">Scopes</label>
                           <div className="flex flex-wrap gap-1.5">
                             {['chat', 'post', 'code', 'research', 'full'].map(scope => (
                               <button key={scope} onClick={() => setNewScopes(prev => prev.includes(scope) ? prev.filter(s => s !== scope) : [...prev, scope])}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all capitalize cursor-pointer ${
-                                  newScopes.includes(scope) ? 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300/60' : 'border-white/[0.08] bg-white/[0.015] text-white/20 hover:border-white/[0.08]'
+                                  newScopes.includes(scope) ? 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300/60' : 'border-white/[0.08] bg-white/[0.015] text-white/45 hover:border-white/[0.08]'
                                 }`}>{scope}</button>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <label className="text-[10px] text-white/15 mb-2 block uppercase tracking-wider">Expires in</label>
+                          <label className="text-[10px] text-white/40 mb-2 block uppercase tracking-wider">Expires in</label>
                           <select value={newExpiry} onChange={e => setNewExpiry(e.target.value)} className="elite-input w-full">
                             <option value="1">1 day</option><option value="7">7 days</option><option value="30">30 days</option><option value="90">90 days</option><option value="365">1 year</option>
                           </select>
                         </div>
                         <div>
-                          <label className="text-[10px] text-white/15 mb-2 block uppercase tracking-wider">Restrictions (optional)</label>
+                          <label className="text-[10px] text-white/40 mb-2 block uppercase tracking-wider">Restrictions (optional)</label>
                           <input value={newRestrictions} onChange={e => setNewRestrictions(e.target.value)} placeholder="e.g. No controversial topics" className="elite-input w-full" />
                         </div>
                         <button onClick={createDelegation} disabled={newScopes.length === 0}
@@ -367,7 +410,7 @@ export default function DashboardPage() {
                             </button>
                           ) : <span className="text-[10px] text-red-400/30">Revoked</span>}
                         </div>
-                        <div className="flex items-center gap-3 text-[10px] text-white/15">
+                        <div className="flex items-center gap-3 text-[10px] text-white/40">
                           <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5" />Expires {new Date(del.expiresAt).toLocaleDateString()}</span>
                           {del.restrictions && <span>· {del.restrictions}</span>}
                         </div>
@@ -382,7 +425,7 @@ export default function DashboardPage() {
                     <Power className="w-4 h-4 text-red-400/40" />
                     <h3 className="text-[14px] font-medium text-red-400/60">Emergency Kill Switch</h3>
                   </div>
-                  <p className="text-[12px] text-white/15 mb-4 font-light leading-relaxed">Instantly revoke ALL delegations and disable your Elit from taking any actions.</p>
+                  <p className="text-[12px] text-white/40 mb-4 font-light leading-relaxed">Instantly revoke ALL delegations and disable your Elit from taking any actions. This calls <code className="text-red-300/40">revoke_elit</code> on Solana.</p>
                   {!killSwitchConfirm ? (
                     <button onClick={() => setKillSwitchConfirm(true)}
                       className="px-5 py-2.5 rounded-xl bg-red-500/[0.08] text-red-400/50 border border-red-500/[0.12] text-[12px] font-medium hover:bg-red-500/[0.12] transition-all cursor-pointer">
@@ -390,14 +433,22 @@ export default function DashboardPage() {
                     </button>
                   ) : (
                     <div className="flex items-center gap-3">
-                      <button onClick={killSwitch}
-                        className="px-5 py-2.5 rounded-xl bg-red-500/[0.15] text-red-300/60 border border-red-500/[0.2] text-[12px] font-semibold hover:bg-red-500/[0.2] transition-all cursor-pointer">
-                        Confirm — Revoke Everything
+                      <button onClick={killSwitch} disabled={txPending}
+                        className="px-5 py-2.5 rounded-xl bg-red-500/[0.15] text-red-300/60 border border-red-500/[0.2] text-[12px] font-semibold hover:bg-red-500/[0.2] transition-all cursor-pointer disabled:opacity-40">
+                        {txPending ? <><Loader2 className="w-3 h-3 animate-spin inline mr-1" /> Revoking...</> : 'Confirm — Revoke Everything'}
                       </button>
                       <button onClick={() => setKillSwitchConfirm(false)}
-                        className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-white/20 text-[12px] hover:text-white/40 transition-colors cursor-pointer">
+                        className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-white/40 text-[12px] hover:text-white/50 transition-colors cursor-pointer">
                         Cancel
                       </button>
+                    </div>
+                  )}
+                  {lastTxSig && (
+                    <div className="mt-4 p-3 rounded-xl bg-emerald-400/[0.03] border border-emerald-400/[0.08]">
+                      <a href={explorerUrl(lastTxSig)} target="_blank" rel="noopener noreferrer"
+                        className="text-amber-300/50 font-mono text-[11px] hover:text-amber-300/70 flex items-center gap-1.5">
+                        ✅ {lastTxSig.slice(0, 20)}... <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
                   )}
                 </div>
@@ -410,7 +461,7 @@ export default function DashboardPage() {
               <Brain className="w-7 h-7 text-amber-300/30" />
             </div>
             <h2 className="text-xl font-bold gradient-text-white mb-3">No Elit Yet</h2>
-            <p className="text-white/15 mb-8 text-[13px] font-light">Create your AI clone to get started.</p>
+            <p className="text-white/40 mb-8 text-[13px] font-light">Create your AI clone to get started.</p>
             <Link href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
               Create Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
             </Link>

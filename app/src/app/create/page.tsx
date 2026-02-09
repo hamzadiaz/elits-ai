@@ -7,7 +7,8 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { generatePersonalityHash, createEmptyProfile, type PersonalityProfile } from '@/lib/personality'
 import { Avatar3D } from '@/components/Avatar3D'
-import { User, Sparkles, ChevronLeft, ChevronRight, Check, Wallet, Upload, Zap, Heart, MessageSquare, Loader2 } from 'lucide-react'
+import { getConnection, getProvider, getProgram, createElitOnChain, explorerUrl } from '@/lib/solana'
+import { User, Sparkles, ChevronLeft, ChevronRight, Check, Wallet, Upload, Zap, Heart, MessageSquare, Loader2, ExternalLink } from 'lucide-react'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -77,12 +78,14 @@ const stepInfo = [
 ]
 
 export default function CreateElitPage() {
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, signTransaction, signAllTransactions } = useWallet()
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [profile, setProfile] = useState<PersonalityProfile>(createEmptyProfile())
   const [creating, setCreating] = useState(false)
   const [hash, setHash] = useState('')
+  const [txSignature, setTxSignature] = useState('')
+  const [txError, setTxError] = useState('')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [generatingAvatar, setGeneratingAvatar] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -126,13 +129,41 @@ export default function CreateElitPage() {
 
   const handleCreate = async () => {
     setCreating(true)
+    setTxError('')
     try {
       const personalityHash = await generatePersonalityHash(profile)
       setHash(personalityHash)
       localStorage.setItem('elitProfile', JSON.stringify(profile))
       localStorage.setItem('elitHash', personalityHash)
+
+      // Send on-chain transaction
+      if (publicKey && signTransaction && signAllTransactions) {
+        try {
+          const connection = getConnection()
+          const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
+          const program = getProgram(provider)
+          const sig = await createElitOnChain(
+            program,
+            publicKey,
+            profile.name.slice(0, 50),
+            (profile.bio || '').slice(0, 280),
+            personalityHash.slice(0, 64),
+            (profile.avatarUrl || '').slice(0, 200),
+          )
+          setTxSignature(sig)
+          localStorage.setItem('elitTxSignature', sig)
+        } catch (err: unknown) {
+          console.error('On-chain creation failed:', err)
+          const msg = err instanceof Error ? err.message : String(err)
+          if (msg.includes('already in use')) {
+            setTxError('Elit already exists on-chain for this wallet!')
+          } else {
+            setTxError(`On-chain tx failed: ${msg.slice(0, 120)}`)
+          }
+        }
+      }
       setStep(4)
-    } catch (err) { console.error(err) }
+    } catch (err) { console.error(err); setTxError(String(err)) }
     finally { setCreating(false) }
   }
 
@@ -144,7 +175,7 @@ export default function CreateElitPage() {
             <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Connect Your Wallet</h1>
-          <p className="text-white/20 mb-8 text-[13px] font-light leading-relaxed">
+          <p className="text-white/45 mb-8 text-[13px] font-light leading-relaxed">
             Connect your Solana wallet to create your Elit. Your wallet address becomes your on-chain identity.
           </p>
           <WalletMultiButton style={{
@@ -162,7 +193,7 @@ export default function CreateElitPage() {
     // Step 0: Identity
     <motion.div key="basics" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
       <h2 className="text-xl font-bold gradient-text-white mb-1">Who Are You?</h2>
-      <p className="text-white/15 text-[13px] mb-8 font-light">Let&apos;s start with the basics.</p>
+      <p className="text-white/40 text-[13px] mb-8 font-light">Let&apos;s start with the basics.</p>
       <div className="space-y-5">
         <div>
           <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-2">Name</label>
@@ -198,8 +229,32 @@ export default function CreateElitPage() {
                 )}
               </div>
               <div>
-                <p className="text-[13px] text-white/25 mb-2">{generatingAvatar ? 'Creating avatar...' : 'Your AI Avatar'}</p>
-                <button onClick={() => fileInputRef.current?.click()} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer">Change photo</button>
+                <p className="text-[13px] text-white/40 mb-2">{generatingAvatar ? 'Creating avatar...' : 'Your AI Avatar'}</p>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => fileInputRef.current?.click()} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer text-left">Change photo</button>
+                  {!generatingAvatar && avatarPreview && (
+                    <>
+                      <button onClick={async () => {
+                        if (!avatarPreview) return
+                        setGeneratingAvatar(true)
+                        try {
+                          const base64 = avatarPreview.split(',')[1]
+                          const mime = avatarPreview.split(';')[0].split(':')[1] || 'image/png'
+                          const res = await fetch('/api/avatar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: base64, mimeType: mime }) })
+                          const data = await res.json()
+                          if (data.avatarUrl) { setAvatarPreview(data.avatarUrl); setProfile(p => ({ ...p, avatarUrl: data.avatarUrl })) }
+                        } catch (err) { console.error(err) }
+                        setGeneratingAvatar(false)
+                      }} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer text-left">🔄 Regenerate</button>
+                      <button onClick={() => {
+                        const a = document.createElement('a')
+                        a.href = avatarPreview
+                        a.download = `elit-avatar-${profile.name || 'avatar'}.png`
+                        a.click()
+                      }} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer text-left">📥 Download PNG</button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -208,7 +263,7 @@ export default function CreateElitPage() {
               className="border border-dashed border-white/[0.08] rounded-2xl p-8 text-center hover:border-amber-500/25 transition-all duration-500 cursor-pointer group"
             >
               <Upload className="w-7 h-7 text-white/10 mx-auto mb-3 group-hover:text-amber-400/30 transition-colors duration-500" />
-              <p className="text-[13px] text-white/20 font-light">Upload a photo to generate your 3D avatar</p>
+              <p className="text-[13px] text-white/45 font-light">Upload a photo to generate your 3D avatar</p>
               <p className="text-[11px] text-white/10 mt-1">PNG, JPG up to 5MB</p>
             </div>
           )}
@@ -219,7 +274,7 @@ export default function CreateElitPage() {
     // Step 1: Skills
     <motion.div key="skills" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
       <h2 className="text-xl font-bold gradient-text-white mb-1">Skills & Interests</h2>
-      <p className="text-white/15 text-[13px] mb-8 font-light">What do you know? What excites you?</p>
+      <p className="text-white/40 text-[13px] mb-8 font-light">What do you know? What excites you?</p>
       <div className="space-y-8">
         <TagSelector options={skillSuggestions} selected={profile.skills} onToggle={t => toggleTag('skills', t)} label="Your Skills & Expertise" />
         <TagSelector options={interestSuggestions} selected={profile.interests} onToggle={t => toggleTag('interests', t)} label="Your Interests" />
@@ -229,7 +284,7 @@ export default function CreateElitPage() {
     // Step 2: Values
     <motion.div key="values" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
       <h2 className="text-xl font-bold gradient-text-white mb-1">Values & Style</h2>
-      <p className="text-white/15 text-[13px] mb-8 font-light">How do you communicate? What matters to you?</p>
+      <p className="text-white/40 text-[13px] mb-8 font-light">How do you communicate? What matters to you?</p>
       <div className="space-y-8">
         <TagSelector options={valueSuggestions} selected={profile.values} onToggle={t => toggleTag('values', t)} label="Core Values" />
         <div>
@@ -241,7 +296,7 @@ export default function CreateElitPage() {
               { label: 'Detail Level', field: 'verbosity' as const, options: ['concise', 'balanced', 'detailed'] },
             ].map(({ label, field, options }) => (
               <div key={field} className="elite-card rounded-xl p-4">
-                <p className="text-[10px] text-white/15 mb-2.5 font-medium uppercase tracking-wider">{label}</p>
+                <p className="text-[10px] text-white/40 mb-2.5 font-medium uppercase tracking-wider">{label}</p>
                 <div className="space-y-1">
                   {options.map(opt => (
                     <button
@@ -267,29 +322,29 @@ export default function CreateElitPage() {
     // Step 3: Review
     <motion.div key="review" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
       <h2 className="text-xl font-bold gradient-text-white mb-1">Review Your Elit</h2>
-      <p className="text-white/15 text-[13px] mb-8 font-light">Everything look right?</p>
+      <p className="text-white/40 text-[13px] mb-8 font-light">Everything look right?</p>
       <div className="elite-card rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-4">
           <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="md" />
           <div>
             <p className="text-white/90 font-semibold text-base">{profile.name || 'Unnamed'}</p>
-            <p className="text-white/15 text-[12px] font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}</p>
+            <p className="text-white/40 text-[12px] font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}</p>
           </div>
         </div>
         <div className="h-px bg-white/[0.03]" />
         <div>
-          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1">Bio</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Bio</p>
           <p className="text-white/30 text-[13px] font-light">{profile.bio || '—'}</p>
         </div>
         <div>
-          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-2">Skills</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Skills</p>
           <div className="flex flex-wrap gap-1.5">
             {profile.skills.map(s => <span key={s} className="elite-tag text-[11px]">{s}</span>)}
-            {profile.skills.length === 0 && <span className="text-white/15 text-[13px]">None selected</span>}
+            {profile.skills.length === 0 && <span className="text-white/40 text-[13px]">None selected</span>}
           </div>
         </div>
         <div>
-          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1">Style</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Style</p>
           <p className="text-white/30 text-[13px] font-light">
             {profile.communicationStyle.formality} · {profile.communicationStyle.humor} · {profile.communicationStyle.verbosity}
           </p>
@@ -303,11 +358,27 @@ export default function CreateElitPage() {
         <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="xl" state="speaking" />
       </motion.div>
       <h2 className="text-2xl font-bold gradient-text-white mb-3">Elit Created</h2>
-      <p className="text-white/20 mb-6 text-[13px] font-light">Your personality hash has been generated. Train your Elit to make it truly you.</p>
-      <div className="elite-card rounded-xl p-4 mb-8 max-w-md mx-auto">
-        <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1.5">Personality Hash (SHA-256)</p>
+      <p className="text-white/45 mb-6 text-[13px] font-light">Your personality hash has been generated. Train your Elit to make it truly you.</p>
+      <div className="elite-card rounded-xl p-4 mb-4 max-w-md mx-auto">
+        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1.5">Personality Hash (SHA-256)</p>
         <p className="text-amber-300/50 font-mono text-[11px] break-all">{hash}</p>
       </div>
+      {txSignature && (
+        <div className="elite-card rounded-xl p-4 mb-4 max-w-md mx-auto">
+          <p className="text-[10px] text-emerald-400/40 uppercase tracking-wider mb-1.5 flex items-center gap-1">✅ Registered On-Chain</p>
+          <a href={explorerUrl(txSignature)} target="_blank" rel="noopener noreferrer"
+            className="text-amber-300/50 font-mono text-[11px] break-all hover:text-amber-300/70 transition-colors flex items-center gap-1.5">
+            {txSignature.slice(0, 20)}...{txSignature.slice(-20)}
+            <ExternalLink className="w-3 h-3 shrink-0" />
+          </a>
+        </div>
+      )}
+      {txError && (
+        <div className="elite-card rounded-xl p-4 mb-4 max-w-md mx-auto border-amber-500/20">
+          <p className="text-[10px] text-amber-400/50 uppercase tracking-wider mb-1">⚠️ On-Chain Status</p>
+          <p className="text-white/40 text-[11px]">{txError}</p>
+        </div>
+      )}
       <div className="flex gap-3 justify-center">
         <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
           Train Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
@@ -334,7 +405,7 @@ export default function CreateElitPage() {
                   }`}>
                     {i < step ? <Check className="w-3 h-3 text-amber-300/60" /> : <s.icon className="w-3 h-3 text-white/50" />}
                   </div>
-                  <span className="text-[11px] text-white/20 hidden sm:block">{s.label}</span>
+                  <span className="text-[11px] text-white/45 hidden sm:block">{s.label}</span>
                 </div>
                 {i < 3 && <div className={`flex-1 h-px transition-all duration-500 ${i < step ? 'bg-amber-500/[0.2]' : 'bg-white/[0.03]'}`} />}
               </div>

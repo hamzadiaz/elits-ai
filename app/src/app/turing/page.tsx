@@ -109,7 +109,7 @@ export default function TuringTestPage() {
                   <motion.div key={item.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.08 }}
                     className="text-center p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
                     <item.icon className="w-4 h-4 text-white/10 mx-auto mb-1.5" />
-                    <span className="text-[10px] text-white/15">{item.label}</span>
+                    <span className="text-[10px] text-white/40">{item.label}</span>
                   </motion.div>
                 ))}
               </div>
@@ -119,7 +119,7 @@ export default function TuringTestPage() {
           {stage === 'test' && (
             <motion.div key="test" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
               <div className="flex items-center justify-between mb-6">
-                <span className="text-[11px] text-white/15">Round {round + 1} of 5</span>
+                <span className="text-[11px] text-white/40">Round {round + 1} of 5</span>
                 <div className="flex gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className={`w-8 h-1 rounded-full transition-all duration-500 ${
@@ -133,7 +133,7 @@ export default function TuringTestPage() {
                 className="elite-card rounded-2xl p-5 mb-5">
                 <div className="flex items-center gap-2 mb-2">
                   <User className="w-3.5 h-3.5 text-amber-300/30" />
-                  <span className="text-[10px] text-white/15 font-medium uppercase tracking-wider">Question</span>
+                  <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Question</span>
                 </div>
                 <p className="text-white/60 text-[14px] font-light">{currentQuestion}</p>
               </motion.div>
@@ -146,12 +146,12 @@ export default function TuringTestPage() {
                         animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1, 0.8] }}
                         transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }} />
                     ))}
-                    <span className="text-[12px] text-white/15 ml-2 font-light">Generating responses...</span>
+                    <span className="text-[12px] text-white/40 ml-2 font-light">Generating responses...</span>
                   </div>
                 </div>
               ) : showingResponses && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
-                  <p className="text-center text-[11px] text-white/15 mb-4 font-light">Which response is from the AI?</p>
+                  <p className="text-center text-[11px] text-white/40 mb-4 font-light">Which response is from the AI?</p>
                   {['A', 'B'].map(label => {
                     const content = label === 'A' ? responseA : responseB
                     const isSelected = selectedGuess === label
@@ -165,9 +165,9 @@ export default function TuringTestPage() {
                         }`}>
                         <div className="flex items-center gap-2 mb-3">
                           <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-semibold ${
-                            isSelected ? 'bg-amber-500/[0.12] text-amber-300/60' : 'bg-white/[0.03] text-white/20'
+                            isSelected ? 'bg-amber-500/[0.12] text-amber-300/60' : 'bg-white/[0.03] text-white/45'
                           }`}>{label}</div>
-                          <span className="text-[10px] text-white/15">Response {label}</span>
+                          <span className="text-[10px] text-white/40">Response {label}</span>
                           {isSelected && (
                             <motion.span initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
                               className="ml-auto text-[10px] text-amber-300/40 font-medium">Selected ✓</motion.span>
@@ -205,7 +205,7 @@ export default function TuringTestPage() {
               <h2 className="text-xl font-bold gradient-text-white mb-2">
                 {scorePercent > 60 ? 'Sharp Eye' : scorePercent > 40 ? 'Not Bad' : 'The Elit Fooled You'}
               </h2>
-              <p className="text-white/20 text-[13px] mb-2 font-light">
+              <p className="text-white/45 text-[13px] mb-2 font-light">
                 You correctly identified the AI in {Math.round(scorePercent / 20)} out of 5 rounds
               </p>
               <p className="text-white/10 text-[12px] mb-8 font-light">
@@ -229,7 +229,7 @@ export default function TuringTestPage() {
                   <Trophy className="w-3.5 h-3.5 text-amber-400/30" />
                   <span className="text-[12px] font-medium text-white/40">How it works</span>
                 </div>
-                <p className="text-[11px] text-white/15 leading-relaxed font-light">
+                <p className="text-[11px] text-white/40 leading-relaxed font-light">
                   The Turing Test compares responses from a real human and their Elit AI clone. The Elit uses personality models trained through conversations, voice calls, and document uploads. All verified on Solana.
                 </p>
               </motion.div>

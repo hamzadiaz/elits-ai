@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: 'Elits AI — Your Verifiable AI Clone on Solana',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Elits AI — Your AI Clone, Verified on Solana',
     description: 'Train it by voice. Let it act for you. Verified on-chain.',
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
   },
   icons: {
     icon: '/favicon.svg',
