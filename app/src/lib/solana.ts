@@ -1,6 +1,6 @@
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js'
 
-export const PROGRAM_ID = new PublicKey('E1itsAiProgramXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') // Will be updated after deploy
+export const PROGRAM_ID = new PublicKey('5RPvUJ1pAQpeADq4QDX179etC3SUmk6q1TFdMYYqGNPF')
 
 export const DEVNET_RPC = 'https://api.devnet.solana.com'
 
