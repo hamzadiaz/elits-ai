@@ -5,3 +5,4 @@ target/
 .vercel/
 .vercel
 .env*.local
+.colosseum.json

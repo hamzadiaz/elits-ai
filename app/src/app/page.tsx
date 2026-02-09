@@ -100,8 +100,8 @@ const features = [
   { icon: Brain, title: '3D AI Avatar', description: 'Upload a photo — AI generates a stylized 3D avatar with idle, speaking, and thinking animations. Your visual identity, on-chain.' },
   { icon: Zap, title: 'Actions & Delegation', description: 'Your Elit posts tweets, writes code, responds to messages — with scoped, time-limited delegations you fully control.' },
   { icon: Shield, title: 'On-Chain Verification', description: 'Personality hash stored on Solana. Anyone can verify your Elit is authorized. One transaction to revoke everything.' },
-  { icon: Fingerprint, title: 'Turing Test', description: 'Blind comparison between you and your Elit. Can people tell the difference? Prove how authentic your AI clone is.' },
-  { icon: Lock, title: 'Emergency Kill Switch', description: 'Full control over your clone. Revoke all delegations and disable actions instantly. Your AI, your rules.' },
+  { icon: Fingerprint, title: 'Turing Test', description: 'Blind comparison between you and your Elit. Can people tell the difference? Prove how authentic your Elit agent is.' },
+  { icon: Lock, title: 'Emergency Kill Switch', description: 'Full control over your agent. Revoke all delegations and disable actions instantly. Your agent, your rules.' },
 ]
 
 const steps = [
@@ -138,7 +138,7 @@ export default function LandingPage() {
 
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
             className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92] mb-8">
-            <span className="gradient-text-white">Your AI Clone,</span><br />
+            <span className="gradient-text-white">Your AI Agent,</span><br />
             <span className="gradient-text">Verified on Solana</span>
           </motion.h1>
 
@@ -239,7 +239,7 @@ export default function LandingPage() {
           <Reveal className="text-center mb-20">
             <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Process</p>
             <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">How It Works</h2>
-            <p className="text-white/50 text-base font-light">Four steps to your verifiable AI clone.</p>
+            <p className="text-white/50 text-base font-light">Four steps to your verified AI agent.</p>
           </Reveal>
 
           <div className="relative space-y-5">
@@ -278,7 +278,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { href: '/create', icon: Sparkles, title: 'Create Your Elit', desc: 'Define your personality and generate a 3D avatar in 4 easy steps.' },
-              { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your clone who you are.' },
+              { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your agent your skills.' },
               { href: '/turing', icon: Eye, title: 'Take the Turing Test', desc: 'Can you tell the AI from the human? 5 rounds, blind comparison.' },
             ].map((item, i) => (
               <Reveal key={item.href} delay={i * 0.08}>
@@ -308,7 +308,7 @@ export default function LandingPage() {
               <div className="relative">
                 <Sparkles className="w-6 h-6 text-amber-400/40 mx-auto mb-6" />
                 <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 leading-tight tracking-tight">
-                  Ready to Clone<br />Yourself?
+                  Ready to Create<br />Your Agent?
                 </h2>
                 <p className="text-white/50 text-sm sm:text-base mb-10 max-w-sm mx-auto font-light leading-relaxed">
                   Your knowledge deserves to live beyond a single conversation. Deploy a verifiable AI that carries your expertise.

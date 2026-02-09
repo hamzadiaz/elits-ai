@@ -85,7 +85,7 @@ export default function TuringTestPage() {
 
               <h1 className="text-3xl font-bold gradient-text-white mb-4 tracking-tight">Turing Test</h1>
               <p className="text-white/25 mb-2 max-w-sm mx-auto text-[14px] font-light">
-                Can you tell the difference between <span className="text-white/60 font-medium">{elitName}</span> and their AI clone?
+                Can you tell the difference between <span className="text-white/60 font-medium">{elitName}</span> and their AI agent?
               </p>
               <p className="text-white/12 text-[13px] mb-8 max-w-sm mx-auto font-light leading-relaxed">
                 Two responses to the same question. One human, one AI. Pick the AI. 5 rounds.
@@ -209,7 +209,7 @@ export default function TuringTestPage() {
                 You correctly identified the AI in {Math.round(scorePercent / 20)} out of 5 rounds
               </p>
               <p className="text-white/10 text-[12px] mb-8 font-light">
-                {scorePercent <= 50 ? `${elitName}'s Elit is nearly indistinguishable. Impressive clone.` : `You've got a keen eye. But the Elit is still learning.`}
+                {scorePercent <= 50 ? `${elitName}'s Elit is nearly indistinguishable. Impressive agent.` : `You've got a keen eye. But the Elit is still learning.`}
               </p>
 
               <div className="flex gap-3 justify-center">
@@ -230,7 +230,7 @@ export default function TuringTestPage() {
                   <span className="text-[12px] font-medium text-white/40">How it works</span>
                 </div>
                 <p className="text-[11px] text-white/40 leading-relaxed font-light">
-                  The Turing Test compares responses from a real human and their Elit AI clone. The Elit uses personality models trained through conversations, voice calls, and document uploads. All verified on Solana.
+                  The Turing Test compares responses from a real human and their Elit AI agent. The Elit uses personality models trained through conversations, voice calls, and document uploads. All verified on Solana.
                 </p>
               </motion.div>
             </motion.div>

@@ -27,7 +27,7 @@ export default function NotFound() {
 
         <h1 className="text-3xl font-bold gradient-text-white mb-3">Page Not Found</h1>
         <p className="text-gray-500 mb-8 text-sm leading-relaxed">
-          This page doesn&apos;t exist — but your AI clone could. Go create one.
+          This page doesn&apos;t exist — but your AI agent could. Go create one.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -75,7 +75,7 @@ export function generateSystemPrompt(profile: PersonalityProfile): string {
       }`
     : ''
 
-  return `You are an AI clone (Elit) of ${profile.name}. You think, speak, and respond exactly as they would.
+  return `You are an AI agent (Elit) of ${profile.name}. You think, speak, and respond exactly as they would.
 
 Bio: ${profile.bio}
 ${skillsStr}
@@ -178,7 +178,7 @@ export function updateKnowledgeGraph(
 
 // Training prompts
 export const trainingPrompts = [
-  "Hey! I'm your Elit — your AI clone in training. Let's start with the basics. Tell me about yourself. What do you do? What are you passionate about?",
+  "Hey! I'm your Elit — your AI agent in training. Let's start with the basics. Tell me about yourself. What do you do? What are you passionate about?",
   "What are your top skills and areas of expertise? What would people come to you for advice about?",
   "How would your closest friends describe your personality? What makes you, you?",
   "What are your core values? What principles guide your decisions?",

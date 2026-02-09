@@ -235,7 +235,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   {[
                     { href: '/train', icon: Mic, title: 'Train', desc: 'Chat or voice' },
-                    { href: '/chat/default', icon: MessageSquare, title: 'Chat', desc: 'Test your clone' },
+                    { href: '/chat/default', icon: MessageSquare, title: 'Chat', desc: 'Test your agent' },
                     { href: '/verify/default', icon: ShieldCheck, title: 'Verify', desc: 'On-chain proof' },
                     { href: '/turing', icon: Eye, title: 'Turing Test', desc: 'Real vs AI' },
                   ].map(action => (
@@ -461,7 +461,7 @@ export default function DashboardPage() {
               <Brain className="w-7 h-7 text-amber-300/30" />
             </div>
             <h2 className="text-xl font-bold gradient-text-white mb-3">No Elit Yet</h2>
-            <p className="text-white/40 mb-8 text-[13px] font-light">Create your AI clone to get started.</p>
+            <p className="text-white/40 mb-8 text-[13px] font-light">Create your AI agent to get started.</p>
             <Link href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
               Create Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
             </Link>
