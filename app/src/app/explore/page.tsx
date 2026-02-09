@@ -1,26 +1,36 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
 import { NFACard } from '@/components/NFACard'
 import { DEMO_AGENTS, CATEGORIES, type AgentCategory, type NFAAgent, buyAgent, getOwnedAgents } from '@/lib/agents'
 import { useToast } from '@/components/Toast'
-import { Search, Sparkles, TrendingUp, Users, ShieldCheck, Zap, Grid3x3, LayoutGrid, ArrowRight, DollarSign, Star, BarChart3, Code, Palette, MessageSquare, Heart, Shield, Brain } from 'lucide-react'
+import {
+  Search, Sparkles, TrendingUp, Users, ShieldCheck, Zap, Grid3x3, LayoutGrid,
+  ArrowRight, DollarSign, Star, BarChart3, Code, Palette, MessageSquare, Heart,
+  Shield, Brain, Headphones, BookOpen, Scale, UserCheck, Database, Share2,
+  Eye, Gamepad2, Languages, Mic, Building2, Briefcase, ChevronLeft, ChevronRight, Crown
+} from 'lucide-react'
 
-const CATEGORY_ICONS: Record<string, typeof Brain> = {
-  DeFi: BarChart3, Content: MessageSquare, 'Dev Tools': Code, Sales: DollarSign,
-  Health: Heart, Creative: Palette, DAO: Shield, Research: Brain,
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  DeFi: BarChart3, Content: MessageSquare, 'Dev Tools': Code, Research: Brain,
+  'Customer Support': Headphones, 'Personal Assistant': UserCheck, Education: BookOpen,
+  Legal: Scale, Health: Heart, Creative: Palette, Sales: DollarSign,
+  'Data Analysis': Database, 'Social Media': Share2, 'Crypto Intel': Eye,
+  Gaming: Gamepad2, Translation: Languages, 'Voice / Persona': Mic,
+  DAO: Shield, 'Real Estate': Building2, Recruiting: Briefcase,
 }
 
 const PLATFORM_STATS = [
   { label: 'Active NFAs', value: '2,847', icon: Users },
   { label: 'On-Chain Verified', value: '1,250', icon: ShieldCheck },
-  { label: 'Revenue Generated', value: '48K SOL', icon: DollarSign },
-  { label: 'Daily Actions', value: '12.3K', icon: Zap },
+  { label: 'Total Volume', value: '48K SOL', icon: DollarSign },
+  { label: 'Active Creators', value: '892', icon: Zap },
 ]
 
-type SortOption = 'trending' | 'price-low' | 'price-high' | 'rating' | 'revenue'
+type SortOption = 'trending' | 'newest' | 'price-low' | 'price-high' | 'rating' | 'revenue' | 'most-used'
+
+const ITEMS_PER_PAGE = 12
 
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -48,34 +58,43 @@ function Reveal({ children, delay = 0, className = '' }: { children: React.React
 }
 
 export default function ExplorePage() {
-  const router = useRouter()
   const { addToast, updateToast } = useToast()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<'all' | AgentCategory>('all')
   const [sortBy, setSortBy] = useState<SortOption>('trending')
   const [owned, setOwned] = useState<string[]>([])
+  const [page, setPage] = useState(1)
 
   useEffect(() => { setOwned(getOwnedAgents()) }, [])
+  useEffect(() => { setPage(1) }, [search, category, sortBy])
 
   const featured = DEMO_AGENTS.filter(a => a.rarity === 'legendary')
 
-  const filtered = DEMO_AGENTS
-    .filter(a => category === 'all' || a.category === category)
-    .filter(a =>
-      !search || a.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.skills.some(s => s.toLowerCase().includes(search.toLowerCase())) ||
-      a.description.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'trending': return b.usageCount - a.usageCount
-        case 'price-low': return a.price - b.price
-        case 'price-high': return b.price - a.price
-        case 'rating': return b.rating - a.rating
-        case 'revenue': return b.revenueGenerated - a.revenueGenerated
-        default: return 0
-      }
-    })
+  const filtered = useMemo(() => {
+    return DEMO_AGENTS
+      .filter(a => category === 'all' || a.category === category)
+      .filter(a =>
+        !search || a.name.toLowerCase().includes(search.toLowerCase()) ||
+        a.skills.some(s => s.toLowerCase().includes(search.toLowerCase())) ||
+        a.description.toLowerCase().includes(search.toLowerCase()) ||
+        a.category.toLowerCase().includes(search.toLowerCase())
+      )
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'trending': return b.usageCount - a.usageCount
+          case 'newest': return 0
+          case 'price-low': return a.price - b.price
+          case 'price-high': return b.price - a.price
+          case 'rating': return b.rating - a.rating
+          case 'revenue': return b.revenueGenerated - a.revenueGenerated
+          case 'most-used': return b.usageCount - a.usageCount
+          default: return 0
+        }
+      })
+  }, [category, search, sortBy])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
   const handleBuy = (agent: NFAAgent) => {
     const toastId = addToast({ type: 'loading', message: `Purchasing ${agent.name}...` })
@@ -141,10 +160,12 @@ export default function ExplorePage() {
                 className="elite-input text-[12px] cursor-pointer"
               >
                 <option value="trending">Trending</option>
+                <option value="newest">Newest</option>
                 <option value="price-low">Price: Low → High</option>
                 <option value="price-high">Price: High → Low</option>
                 <option value="rating">Highest Rated</option>
                 <option value="revenue">Most Revenue</option>
+                <option value="most-used">Most Used</option>
               </select>
             </div>
           </Reveal>
@@ -164,6 +185,7 @@ export default function ExplorePage() {
               </button>
               {CATEGORIES.map(cat => {
                 const Icon = CATEGORY_ICONS[cat] || Brain
+                const count = DEMO_AGENTS.filter(a => a.category === cat).length
                 return (
                   <button
                     key={cat}
@@ -175,6 +197,7 @@ export default function ExplorePage() {
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" /> {cat}
+                    <span className="text-[9px] opacity-50">({count})</span>
                   </button>
                 )
               })}
@@ -183,47 +206,60 @@ export default function ExplorePage() {
         </div>
       </section>
 
-      {/* Featured */}
+      {/* Featured Legendary Agents */}
+      {category === 'all' && !search && (
+        <section className="px-4 pb-12">
+          <div className="max-w-6xl mx-auto">
+            <Reveal>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-amber-400/40" />
+                  <h2 className="text-[15px] font-semibold text-white/60">Legendary NFAs</h2>
+                </div>
+                <span className="text-[10px] text-white/20 uppercase tracking-wider">Top Performers</span>
+              </div>
+            </Reveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+              {featured.map((agent, i) => (
+                <NFACard key={agent.id} agent={agent} delay={i * 0.08} onBuy={handleBuy} owned={owned.includes(agent.id)} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* All Agents */}
       <section className="px-4 pb-12">
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-amber-300/30" />
-                <h2 className="text-[15px] font-semibold text-white/60">Legendary NFAs</h2>
-              </div>
-              <span className="text-[10px] text-white/20 uppercase tracking-wider">Top Performers</span>
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-16">
-            {featured.map((agent, i) => (
-              <NFACard key={agent.id} agent={agent} delay={i * 0.08} onBuy={handleBuy} owned={owned.includes(agent.id)} />
-            ))}
-          </div>
-
-          {/* All Agents */}
-          <Reveal>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
                 <LayoutGrid className="w-4 h-4 text-amber-300/30" />
-                <h2 className="text-[15px] font-semibold text-white/60">All NFAs</h2>
+                <h2 className="text-[15px] font-semibold text-white/60">
+                  {category === 'all' ? 'All NFAs' : category}
+                </h2>
                 <span className="text-[11px] text-white/20 ml-2">{filtered.length} agents</span>
               </div>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2 text-[11px] text-white/30">
+                  Page {page} of {totalPages}
+                </div>
+              )}
             </div>
           </Reveal>
 
           <AnimatePresence mode="wait">
-            {filtered.length > 0 ? (
+            {paginated.length > 0 ? (
               <motion.div
-                key={category + sortBy}
+                key={category + sortBy + page}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                {filtered.map((agent, i) => (
-                  <NFACard key={agent.id} agent={agent} delay={i * 0.05} onBuy={handleBuy} owned={owned.includes(agent.id)} />
+                {paginated.map((agent, i) => (
+                  <NFACard key={agent.id} agent={agent} delay={i * 0.04} onBuy={handleBuy} owned={owned.includes(agent.id)} />
                 ))}
               </motion.div>
             ) : (
@@ -234,6 +270,39 @@ export default function ExplorePage() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/30 hover:text-white/50 disabled:opacity-20 transition-all cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-8 h-8 rounded-lg text-[12px] font-medium transition-all cursor-pointer ${
+                    p === page
+                      ? 'bg-amber-500/[0.15] text-amber-300/70 border border-amber-500/25'
+                      : 'bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/30 hover:text-white/50 disabled:opacity-20 transition-all cursor-pointer"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
