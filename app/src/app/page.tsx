@@ -96,19 +96,19 @@ function Reveal({ children, delay = 0, className = '' }: { children: React.React
 }
 
 const features = [
-  { icon: Mic, title: 'Voice Training', description: 'Talk naturally via Gemini Live. It learns your knowledge, personality, and communication style through real conversations.' },
-  { icon: Brain, title: '3D AI Avatar', description: 'Upload a photo — AI generates a stylized 3D avatar with idle, speaking, and thinking animations. Your visual identity, on-chain.' },
-  { icon: Zap, title: 'Actions & Delegation', description: 'Your Elit posts tweets, writes code, responds to messages — with scoped, time-limited delegations you fully control.' },
-  { icon: Shield, title: 'On-Chain Verification', description: 'Personality hash stored on Solana. Anyone can verify your Elit is authorized. One transaction to revoke everything.' },
-  { icon: Fingerprint, title: 'Agent Leveling & XP', description: 'Your Elit levels up as you train it. Track capabilities across knowledge, communication, actions, trust, and creativity.' },
-  { icon: Lock, title: 'Agent Marketplace', description: 'Browse verified agents, use templates, or fork existing Elits. A living economy of AI agents on Solana.' },
+  { icon: Fingerprint, title: 'Non-Fungible Agents', description: 'Each agent is a unique on-chain asset — not a token, not a JPEG. A living AI with its own identity, skills, and earning history.' },
+  { icon: Mic, title: 'Voice Training', description: 'Talk naturally via Gemini Live. Your agent learns your knowledge, personality, and style through real conversations.' },
+  { icon: Brain, title: 'AI-Generated Avatar', description: 'Upload a photo — AI generates a holographic neural portrait. Multiple styles available. Your visual identity, on-chain.' },
+  { icon: Lock, title: 'Own, Trade & Earn', description: 'Buy and sell agents on the marketplace. Owners earn 70% of usage fees. Creators earn royalties on every resale.' },
+  { icon: Shield, title: 'On-Chain Verification', description: 'Agent identity stored on Solana via Metaplex Core. Anyone can verify ownership. One transaction to revoke.' },
+  { icon: Zap, title: 'Agent Marketplace', description: 'Browse, fork, or buy agents built by the community. A living economy where AI agents generate real revenue.' },
 ]
 
 const steps = [
-  { num: '01', title: 'Create or Browse', desc: 'Build from scratch or fork a template from the marketplace. Connect your Solana wallet.', icon: Fingerprint },
-  { num: '02', title: 'Train Your Agent', desc: 'Chat or call your Elit via Gemini Live. It learns your knowledge, personality, and style.', icon: Mic },
-  { num: '03', title: 'Level Up', desc: 'Earn XP, unlock milestones, and watch your agent\'s capabilities grow with every interaction.', icon: Brain },
-  { num: '04', title: 'Deploy & Verify', desc: 'Personality hash goes on-chain. Your Elit is live, verifiable, and acting on your behalf.', icon: Globe },
+  { num: '01', title: 'Create or Buy', desc: 'Build an agent from scratch, fork a template, or buy one from the marketplace. Connect your Solana wallet.', icon: Fingerprint },
+  { num: '02', title: 'Train by Voice', desc: 'Talk to your agent via Gemini Live. It learns your knowledge, personality, and expertise through conversation.', icon: Mic },
+  { num: '03', title: 'Mint On-Chain', desc: 'Your agent becomes a Non-Fungible Agent on Solana. Unique identity, verifiable ownership, tradeable asset.', icon: Shield },
+  { num: '04', title: 'Earn & Trade', desc: 'Your NFA earns usage fees when others interact with it. List it on the marketplace, or hold and collect revenue.', icon: Zap },
 ]
 
 const stats = [
@@ -137,19 +137,23 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92] mb-8">
-            <span className="gradient-text-white">Your AI Agent,</span><br />
-            <span className="gradient-text">Verified on Solana</span>
+            className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92] mb-4">
+            <span className="gradient-text-white">Elits</span>
           </motion.h1>
 
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
+            className="mb-8">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-light tracking-wide text-amber-400/70">Non-Fungible Agents</span>
+          </motion.div>
+
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg sm:text-xl max-w-xl mx-auto mb-4 leading-relaxed font-light">
-            <TypingText texts={["Teach it by voice. Let it act for you.", "Your knowledge, verified on-chain.", "A digital twin that thinks like you.", "Delegate. Verify. Trust."]} />
+            className="text-lg sm:text-xl max-w-2xl mx-auto mb-4 leading-relaxed font-light">
+            <TypingText texts={["NFTs were just pictures. NFAs are AI agents you own, use, and earn from.", "Create. Train. Trade. Earn. On Solana.", "Your agent made money while you slept.", "Own an AI agent. Not a JPEG."]} />
           </motion.div>
 
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.35 }}
-            className="text-[13px] text-white/40 max-w-md mx-auto mb-12 leading-relaxed">
-            Create a verifiable AI version of yourself — with cryptographic proof of authorization on Solana.
+            className="text-[13px] text-white/40 max-w-lg mx-auto mb-12 leading-relaxed">
+            Unique AI agents stored on-chain. Each one has its own personality, skills, and earning potential. Create, trade, and monetize AI agents as Non-Fungible Agents on Solana.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.45 }}
@@ -269,18 +273,18 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <Reveal className="text-center mb-16">
             <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Ecosystem</p>
-            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">Agent Marketplace</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">NFA Marketplace</h2>
             <p className="text-white/50 text-base max-w-lg mx-auto font-light leading-relaxed">
-              Browse verified agents, use templates, or fork existing Elits. A living economy of AI agents — each one unique, each one on-chain.
+              The world&apos;s first marketplace for Non-Fungible Agents. Browse, buy, and sell AI agents that actually do things — and earn you money.
             </p>
           </Reveal>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
             {[
-              { value: '2,847+', label: 'Active Agents' },
-              { value: '12.3K', label: 'Daily Actions' },
-              { value: '48K+', label: 'Templates Used' },
-              { value: '$0', label: 'To Get Started' },
+              { value: '2,847+', label: 'Agents Minted' },
+              { value: '12.3K', label: 'Daily Interactions' },
+              { value: '$48K+', label: 'Revenue Generated' },
+              { value: '70%', label: 'Owner Revenue Share' },
             ].map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.06}>
                 <div className="text-center p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -347,10 +351,10 @@ export default function LandingPage() {
               <div className="relative">
                 <Sparkles className="w-6 h-6 text-amber-400/40 mx-auto mb-6" />
                 <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 leading-tight tracking-tight">
-                  Ready to Create<br />Your Agent?
+                  Own an AI Agent.<br />Not a JPEG.
                 </h2>
                 <p className="text-white/50 text-sm sm:text-base mb-10 max-w-sm mx-auto font-light leading-relaxed">
-                  Your knowledge deserves to live beyond a single conversation. Deploy a verifiable AI that carries your expertise.
+                  NFTs failed because they were just pictures. Non-Fungible Agents are AI you own, use, and earn from. The first yield-bearing NFTs on Solana.
                 </p>
                 <Link href="/create"
                   className="beam-btn group inline-flex items-center gap-2 px-10 py-4 bg-amber-500/10 text-amber-200 font-semibold text-base hover:bg-amber-500/15 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
@@ -370,7 +374,8 @@ export default function LandingPage() {
             <div className="w-4 h-4 rounded bg-gradient-to-br from-amber-600 to-amber-500 flex items-center justify-center">
               <Zap className="w-2.5 h-2.5 text-black" fill="currentColor" />
             </div>
-            <span className="font-medium text-white/40">Elits AI</span>
+            <span className="font-medium text-white/40">Elits</span>
+            <span className="text-amber-400/40 font-light ml-1">Non-Fungible Agents</span>
           </div>
           <p>Built for Colosseum Agent Hackathon · Powered by Solana & Gemini</p>
         </div>

@@ -5,15 +5,15 @@ import { Navbar } from '@/components/Navbar'
 import { ToastProvider } from '@/components/Toast'
 
 export const metadata: Metadata = {
-  title: 'Elits AI — Verified AI Agents on Solana',
-  description: 'Create verified AI agents on Solana trained on your skills. Teach them by voice with Gemini Live. Let them act on your behalf with on-chain delegation and verification.',
-  keywords: ['AI agent', 'Solana', 'AI agent', 'voice training', 'Gemini', 'blockchain verification', 'digital twin'],
-  authors: [{ name: 'Elits AI' }],
+  title: 'Elits — Non-Fungible Agents on Solana',
+  description: 'The first Non-Fungible Agents (NFAs) on Solana. Own, trade, and earn from unique AI agents. NFTs were just pictures — NFAs are AI you own, use, and earn from.',
+  keywords: ['NFA', 'Non-Fungible Agents', 'AI agent', 'Solana', 'NFT', 'AI NFT', 'voice training', 'Gemini', 'agent marketplace', 'yield-bearing NFT'],
+  authors: [{ name: 'Elits' }],
   openGraph: {
-    title: 'Elits AI — Verified AI Agents on Solana',
-    description: 'Create verified AI agents on Solana. Train them on your skills. Let them act for you.',
+    title: 'Elits — Non-Fungible Agents on Solana',
+    description: 'NFTs were just pictures. NFAs are AI agents you own, use, and earn from. The first yield-bearing agents on Solana.',
     url: 'https://elits-ai.vercel.app',
-    siteName: 'Elits AI',
+    siteName: 'Elits',
     type: 'website',
     locale: 'en_US',
     images: [
@@ -21,14 +21,14 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Elits AI — Verified AI Agents on Solana',
+        alt: 'Elits — Non-Fungible Agents on Solana',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Elits AI — Verified AI Agents on Solana',
-    description: 'Train it by voice. Let it act for you. Verified on-chain.',
+    title: 'Elits — Non-Fungible Agents on Solana',
+    description: 'NFTs were just pictures. NFAs are AI agents you own, use, and earn from.',
     images: ['/og-image.png'],
   },
   icons: {

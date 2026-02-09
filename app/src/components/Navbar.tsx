@@ -49,10 +49,10 @@ export function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
               <img src="/logo.png" alt="Elits AI" className="h-9 w-auto object-contain" />
-              <span className="font-semibold text-lg tracking-tight">
-                <span className="text-white/90">Elits</span>
-                <span className="gradient-text ml-0.5 font-bold">AI</span>
-              </span>
+              <div className="flex flex-col leading-tight">
+                <span className="font-semibold text-lg tracking-tight text-white/90">Elits</span>
+                <span className="text-[9px] text-amber-400/50 tracking-[0.15em] uppercase font-medium -mt-0.5">Non-Fungible Agents</span>
+              </div>
             </Link>
 
             {/* Desktop nav */}
