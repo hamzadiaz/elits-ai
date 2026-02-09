@@ -53,15 +53,44 @@ function AmbientBackground() {
       <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[200px] animate-pulse-glow" style={{ animationDelay: '2.5s' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-700/3 rounded-full blur-[250px]" />
       {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-[2px] h-[2px] bg-amber-400/20 rounded-full"
+        <motion.div key={i} className="absolute w-[2px] h-[2px] bg-amber-400/20 rounded-full"
           style={{ top: `${20 + i * 14}%`, left: `${8 + i * 18}%` }}
           animate={{ y: [0, -20, 0], opacity: [0.1, 0.4, 0.1] }}
-          transition={{ duration: 5 + i * 1.5, repeat: Infinity, delay: i * 0.7 }}
-        />
+          transition={{ duration: 5 + i * 1.5, repeat: Infinity, delay: i * 0.7 }} />
       ))}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
+    </div>
+  )
+}
+
+/* Simple reveal hook — sets visible when element enters viewport */
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    // Start visible after a short delay as fallback
+    const fallback = setTimeout(() => setVisible(true), 800)
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); clearTimeout(fallback) }
+    }, { threshold: 0.05 })
+    obs.observe(el)
+    return () => { obs.disconnect(); clearTimeout(fallback) }
+  }, [])
+  return { ref, visible }
+}
+
+function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const { ref, visible } = useReveal()
+  return (
+    <div ref={ref} className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+      }}>
+      {children}
     </div>
   )
 }
@@ -107,69 +136,38 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92] mb-8"
-          >
-            <span className="gradient-text-white">Your AI Clone,</span>
-            <br />
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92] mb-8">
+            <span className="gradient-text-white">Your AI Clone,</span><br />
             <span className="gradient-text">Verified on Solana</span>
           </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg sm:text-xl max-w-xl mx-auto mb-4 leading-relaxed font-light"
-          >
-            <TypingText texts={[
-              "Teach it by voice. Let it act for you.",
-              "Your knowledge, verified on-chain.",
-              "A digital twin that thinks like you.",
-              "Delegate. Verify. Trust."
-            ]} />
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-lg sm:text-xl max-w-xl mx-auto mb-4 leading-relaxed font-light">
+            <TypingText texts={["Teach it by voice. Let it act for you.", "Your knowledge, verified on-chain.", "A digital twin that thinks like you.", "Delegate. Verify. Trust."]} />
           </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.35 }}
-            className="text-[13px] text-white/40 max-w-md mx-auto mb-12 leading-relaxed"
-          >
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.35 }}
+            className="text-[13px] text-white/40 max-w-md mx-auto mb-12 leading-relaxed">
             Create a verifiable AI version of yourself — with cryptographic proof of authorization on Solana.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.45 }}
-            className="flex flex-col sm:flex-row gap-3 justify-center"
-          >
-            <Link
-              href="/create"
-              className="beam-btn group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-amber-500/10 text-amber-200 font-medium text-sm hover:bg-amber-500/15 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-            >
-              <Sparkles className="w-3.5 h-3.5 opacity-70" />
-              Create Your Elit
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.45 }}
+            className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/create"
+              className="beam-btn group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-amber-500/10 text-amber-200 font-medium text-sm hover:bg-amber-500/15 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+              <Sparkles className="w-3.5 h-3.5 opacity-70" /> Create Your Elit
               <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-80 transition-all" />
             </Link>
-            <Link
-              href="#how-it-works"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-white/50 font-medium text-sm hover:bg-white/[0.06] hover:border-white/15 hover:text-white/70 transition-all duration-400"
-            >
+            <Link href="#how-it-works"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-white/50 font-medium text-sm hover:bg-white/[0.06] hover:border-white/15 hover:text-white/70 transition-all">
               How It Works
             </Link>
           </motion.div>
 
-          {/* Abstract orb visualization */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-24 flex justify-center"
-          >
+          {/* Orb */}
+          <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, delay: 0.7, ease: [0.22, 1, 0.36, 1] }} className="mt-24 flex justify-center">
             <div className="relative w-48 h-48 sm:w-64 sm:h-64">
               <div className="absolute inset-0 rounded-full border border-amber-500/5 animate-spin-slow" />
               <div className="absolute inset-3 rounded-full border border-amber-500/8" style={{ animation: 'spin-slow 18s linear infinite reverse' }} />
@@ -179,16 +177,13 @@ export default function LandingPage() {
                 <Brain className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400/50" />
               </div>
               {[0, 60, 120, 180, 240, 300].map((deg, i) => (
-                <motion.div
-                  key={deg}
-                  className="absolute w-1 h-1 rounded-full bg-amber-400/40"
+                <motion.div key={deg} className="absolute w-1 h-1 rounded-full bg-amber-400/40"
                   style={{ top: '50%', left: '50%' }}
                   animate={{
-                    x: [Math.cos((deg) * Math.PI / 180) * 90, Math.cos((deg + 360) * Math.PI / 180) * 90],
-                    y: [Math.sin((deg) * Math.PI / 180) * 90, Math.sin((deg + 360) * Math.PI / 180) * 90],
+                    x: [Math.cos(deg * Math.PI / 180) * 90, Math.cos((deg + 360) * Math.PI / 180) * 90],
+                    y: [Math.sin(deg * Math.PI / 180) * 90, Math.sin((deg + 360) * Math.PI / 180) * 90],
                   }}
-                  transition={{ duration: 25, repeat: Infinity, ease: 'linear', delay: i * 0.4 }}
-                />
+                  transition={{ duration: 25, repeat: Infinity, ease: 'linear', delay: i * 0.4 }} />
               ))}
             </div>
           </motion.div>
@@ -200,19 +195,12 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: i * 0.08, duration: 0.6 }}
-                className="text-center"
-              >
+              <Reveal key={stat.label} delay={i * 0.08} className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold gradient-text mb-1.5 tracking-tight">
                   <Counter target={stat.value} suffix={stat.suffix} />
                 </div>
                 <p className="text-[11px] text-white/35 uppercase tracking-widest font-medium">{stat.label}</p>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -221,53 +209,25 @@ export default function LandingPage() {
       {/* ──── FEATURES ──── */}
       <section className="py-32 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4"
-            >
-              Capabilities
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight"
-            >
-              Everything Your Elit Can Do
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: 0.1 }}
-              className="text-white/50 text-base max-w-lg mx-auto font-light leading-relaxed"
-            >
+          <Reveal className="text-center mb-20">
+            <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Capabilities</p>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">Everything Your Elit Can Do</h2>
+            <p className="text-white/50 text-base max-w-lg mx-auto font-light leading-relaxed">
               A full AI replica of yourself, powered by advanced language models and secured by Solana.
-            </motion.p>
-          </div>
+            </p>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ delay: i * 0.06, duration: 0.5 }}
-                className="group beam-border beam-border-hover p-7 rounded-2xl cursor-default hover:bg-white/[0.03] transition-all duration-500"
-              >
-                <div className="w-10 h-10 rounded-xl bg-amber-500/8 border border-amber-500/15 flex items-center justify-center mb-5 group-hover:bg-amber-500/12 group-hover:border-amber-500/25 transition-all duration-500">
-                  <feature.icon className="w-4 h-4 text-amber-400/60 group-hover:text-amber-400/80 transition-colors duration-500" />
+              <Reveal key={feature.title} delay={i * 0.06}>
+                <div className="group beam-border beam-border-hover p-7 rounded-2xl cursor-default hover:bg-white/[0.03] transition-all duration-500 h-full">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/8 border border-amber-500/15 flex items-center justify-center mb-5 group-hover:bg-amber-500/12 group-hover:border-amber-500/25 transition-all duration-500">
+                    <feature.icon className="w-4 h-4 text-amber-400/60 group-hover:text-amber-400/80 transition-colors duration-500" />
+                  </div>
+                  <h3 className="text-[15px] font-semibold text-white/80 mb-2 group-hover:text-white transition-colors duration-500">{feature.title}</h3>
+                  <p className="text-white/45 text-[13px] leading-relaxed font-light">{feature.description}</p>
                 </div>
-                <h3 className="text-[15px] font-semibold text-white/80 mb-2 group-hover:text-white transition-colors duration-500">
-                  {feature.title}
-                </h3>
-                <p className="text-white/45 text-[13px] leading-relaxed font-light">{feature.description}</p>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -276,49 +236,29 @@ export default function LandingPage() {
       {/* ──── HOW IT WORKS ──── */}
       <section id="how-it-works" className="py-32 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-20">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4"
-            >
-              Process
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight"
-            >
-              How It Works
-            </motion.h2>
+          <Reveal className="text-center mb-20">
+            <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Process</p>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">How It Works</h2>
             <p className="text-white/50 text-base font-light">Four steps to your verifiable AI clone.</p>
-          </div>
+          </Reveal>
 
           <div className="relative space-y-5">
             <div className="absolute left-7 top-8 bottom-8 w-px bg-gradient-to-b from-amber-500/20 via-amber-500/8 to-transparent hidden sm:block" />
             {steps.map((step, i) => (
-              <motion.div
-                key={step.num}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="relative flex items-start gap-5 group"
-              >
-                <div className="relative shrink-0 w-14 h-14 rounded-2xl bg-white/[0.03] border border-amber-500/10 flex items-center justify-center group-hover:border-amber-500/25 group-hover:bg-amber-500/5 transition-all duration-500">
-                  <step.icon className="w-5 h-5 text-white/30 group-hover:text-amber-400/60 transition-colors duration-500" />
-                </div>
-                <div className="flex-1 pb-2 pt-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-[10px] font-mono text-amber-500/40">{step.num}</span>
-                    <h3 className="text-[15px] font-semibold text-white/80">{step.title}</h3>
+              <Reveal key={step.num} delay={i * 0.1}>
+                <div className="relative flex items-start gap-5 group">
+                  <div className="relative shrink-0 w-14 h-14 rounded-2xl bg-white/[0.03] border border-amber-500/10 flex items-center justify-center group-hover:border-amber-500/25 group-hover:bg-amber-500/5 transition-all duration-500">
+                    <step.icon className="w-5 h-5 text-white/30 group-hover:text-amber-400/60 transition-colors duration-500" />
                   </div>
-                  <p className="text-white/45 text-[13px] leading-relaxed font-light">{step.desc}</p>
+                  <div className="flex-1 pb-2 pt-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="text-[10px] font-mono text-amber-500/40">{step.num}</span>
+                      <h3 className="text-[15px] font-semibold text-white/80">{step.title}</h3>
+                    </div>
+                    <p className="text-white/45 text-[13px] leading-relaxed font-light">{step.desc}</p>
+                  </div>
                 </div>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -327,28 +267,13 @@ export default function LandingPage() {
       {/* ──── TRY IT ──── */}
       <section className="py-32 px-4 border-t border-amber-500/8">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4"
-            >
-              Experience
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight"
-            >
-              Try It Yourself
-            </motion.h2>
+          <Reveal className="text-center mb-16">
+            <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Experience</p>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">Try It Yourself</h2>
             <p className="text-white/50 text-base max-w-lg mx-auto font-light leading-relaxed">
               Create your Elit in minutes. No cost, no commitment — just connect your wallet and start.
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
@@ -356,14 +281,8 @@ export default function LandingPage() {
               { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your clone who you are.' },
               { href: '/turing', icon: Eye, title: 'Take the Turing Test', desc: 'Can you tell the AI from the human? 5 rounds, blind comparison.' },
             ].map((item, i) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-              >
-                <Link href={item.href} className="group block beam-border beam-border-hover p-7 rounded-2xl hover:bg-white/[0.03] transition-all duration-500">
+              <Reveal key={item.href} delay={i * 0.08}>
+                <Link href={item.href} className="group block beam-border beam-border-hover p-7 rounded-2xl hover:bg-white/[0.03] transition-all duration-500 h-full">
                   <div className="w-10 h-10 rounded-xl bg-amber-500/8 border border-amber-500/15 flex items-center justify-center mb-5 group-hover:bg-amber-500/12 group-hover:border-amber-500/25 group-hover:scale-105 transition-all duration-500">
                     <item.icon className="w-4 h-4 text-amber-400/60" />
                   </div>
@@ -373,7 +292,7 @@ export default function LandingPage() {
                     Try now <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-500" />
                   </div>
                 </Link>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -382,34 +301,26 @@ export default function LandingPage() {
       {/* ──── CTA ──── */}
       <section className="py-32 px-4">
         <div className="max-w-2xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6 }}
-            className="relative beam-border rounded-3xl p-12 sm:p-16 text-center overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.04] via-transparent to-amber-600/[0.04]" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-amber-500/8 blur-[120px] rounded-full" />
-
-            <div className="relative">
-              <Sparkles className="w-6 h-6 text-amber-400/40 mx-auto mb-6" />
-              <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 leading-tight tracking-tight">
-                Ready to Clone<br />Yourself?
-              </h2>
-              <p className="text-white/50 text-sm sm:text-base mb-10 max-w-sm mx-auto font-light leading-relaxed">
-                Your knowledge deserves to live beyond a single conversation. Deploy a verifiable AI that carries your expertise.
-              </p>
-              <Link
-                href="/create"
-                className="beam-btn group inline-flex items-center gap-2 px-10 py-4 bg-amber-500/10 text-amber-200 font-semibold text-base hover:bg-amber-500/15 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-              >
-                <Sparkles className="w-4 h-4 opacity-60" />
-                Create Your Elit
-                <ArrowRight className="w-4 h-4 opacity-40 group-hover:translate-x-0.5 group-hover:opacity-70 transition-all" />
-              </Link>
+          <Reveal>
+            <div className="relative beam-border rounded-3xl p-12 sm:p-16 text-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.04] via-transparent to-amber-600/[0.04]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-amber-500/8 blur-[120px] rounded-full" />
+              <div className="relative">
+                <Sparkles className="w-6 h-6 text-amber-400/40 mx-auto mb-6" />
+                <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 leading-tight tracking-tight">
+                  Ready to Clone<br />Yourself?
+                </h2>
+                <p className="text-white/50 text-sm sm:text-base mb-10 max-w-sm mx-auto font-light leading-relaxed">
+                  Your knowledge deserves to live beyond a single conversation. Deploy a verifiable AI that carries your expertise.
+                </p>
+                <Link href="/create"
+                  className="beam-btn group inline-flex items-center gap-2 px-10 py-4 bg-amber-500/10 text-amber-200 font-semibold text-base hover:bg-amber-500/15 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                  <Sparkles className="w-4 h-4 opacity-60" /> Create Your Elit
+                  <ArrowRight className="w-4 h-4 opacity-40 group-hover:translate-x-0.5 group-hover:opacity-70 transition-all" />
+                </Link>
+              </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </section>
 
