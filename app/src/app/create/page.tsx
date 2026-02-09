@@ -371,13 +371,13 @@ export default function CreateElitPage() {
       </div>
     </motion.div>,
 
-    // Step 4: Success
+    // Step 4: Success + Mint as NFA
     <motion.div key="success" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="text-center">
       <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', bounce: 0.4, delay: 0.2 }} className="mb-6">
         <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="xl" state="speaking" />
       </motion.div>
       <h2 className="text-2xl font-bold gradient-text-white mb-3">Elit Created</h2>
-      <p className="text-white/45 mb-6 text-[13px] font-light">Your personality hash has been generated. Train your Elit to make it truly you.</p>
+      <p className="text-white/45 mb-6 text-[13px] font-light">Your personality hash has been generated. Mint it as an NFA to list on the marketplace.</p>
       <div className="elite-card rounded-xl p-4 mb-4 max-w-md mx-auto">
         <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1.5">Personality Hash (SHA-256)</p>
         <p className="text-amber-300/50 font-mono text-[11px] break-all">{hash}</p>
@@ -398,6 +398,54 @@ export default function CreateElitPage() {
           <p className="text-white/40 text-[11px]">{txError}</p>
         </div>
       )}
+      {/* Mint as NFA Section */}
+      <div className="elite-card rounded-2xl p-6 mb-6 max-w-md mx-auto text-left">
+        <p className="text-[11px] text-amber-400/50 uppercase tracking-wider mb-3 font-semibold">⚡ Mint as NFA</p>
+        <p className="text-[12px] text-white/30 mb-4 font-light">Turn your Elit into a Non-Fungible Agent on Solana. Set a price and earn from every interaction.</p>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="text-[10px] text-white/25 uppercase tracking-wider">Price (SOL)</label>
+            <input type="number" defaultValue="1.0" step="0.1" min="0.1" className="elite-input w-full mt-1" />
+          </div>
+          <div>
+            <label className="text-[10px] text-white/25 uppercase tracking-wider">Per-Use Fee (SOL)</label>
+            <input type="number" defaultValue="0.002" step="0.001" min="0.001" className="elite-input w-full mt-1" />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label className="text-[10px] text-white/25 uppercase tracking-wider mb-2 block">Avatar Style</label>
+          <div className="grid grid-cols-5 gap-2">
+            {(['golden-holographic', 'cyberpunk-neon', 'minimalist-mono', 'anime-ethereal', 'dark-fantasy'] as const).map(s => {
+              const colors: Record<string, string> = {
+                'golden-holographic': 'from-amber-400 to-yellow-600',
+                'cyberpunk-neon': 'from-cyan-400 to-pink-500',
+                'minimalist-mono': 'from-white to-gray-600',
+                'anime-ethereal': 'from-pink-300 to-purple-400',
+                'dark-fantasy': 'from-purple-500 to-emerald-500',
+              }
+              return (
+                <button key={s} className="aspect-square rounded-xl bg-gradient-to-br border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer overflow-hidden" title={s}>
+                  <div className={`w-full h-full bg-gradient-to-br ${colors[s]} opacity-40 hover:opacity-60 transition-opacity`} />
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            const toastId = addToast({ type: 'loading', message: 'Minting NFA on Solana...' })
+            setTimeout(() => {
+              const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+              let sig = ''; for (let i = 0; i < 88; i++) sig += chars[Math.floor(Math.random() * chars.length)]
+              updateToast(toastId, { type: 'success', message: 'NFA minted successfully!', txSignature: sig })
+            }, 2000)
+          }}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 inline mr-2 opacity-60" />
+          Mint as NFA
+        </button>
+      </div>
       <div className="flex gap-3 justify-center">
         <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
           Train Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />

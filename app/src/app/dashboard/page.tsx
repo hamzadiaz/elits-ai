@@ -18,6 +18,67 @@ import { LevelBadge } from '@/components/LevelBadge'
 import { CapabilityChart } from '@/components/CapabilityChart'
 import { useToast } from '@/components/Toast'
 import { calculateXP, calculateCapabilities, getUnlockedMilestones, type AgentStats } from '@/lib/xp'
+import { DEMO_AGENTS, getOwnedAgents, AVATAR_STYLES, RARITY_CONFIG, type NFAAgent } from '@/lib/agents'
+import { AgentAvatar } from '@/components/NFACard'
+import { TrendingUp, DollarSign, Star } from 'lucide-react'
+
+function MyNFAsSection() {
+  const [ownedIds, setOwnedIds] = useState<string[]>([])
+  useEffect(() => { setOwnedIds(getOwnedAgents()) }, [])
+  const ownedAgents = DEMO_AGENTS.filter(a => ownedIds.includes(a.id))
+  const totalRevenue = ownedAgents.reduce((sum, a) => sum + a.revenueGenerated, 0)
+  const portfolioValue = ownedAgents.reduce((sum, a) => sum + a.price, 0)
+
+  if (ownedAgents.length === 0) return (
+    <motion.div variants={{ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } }} className="elite-card rounded-2xl p-6 text-center">
+      <h3 className="text-[13px] font-semibold text-white/60 mb-2">My NFAs</h3>
+      <p className="text-[12px] text-white/25 mb-4">You don&apos;t own any NFAs yet.</p>
+      <Link href="/explore" className="text-[11px] text-amber-400/60 hover:text-amber-400 transition-colors">Browse Marketplace →</Link>
+    </motion.div>
+  )
+
+  return (
+    <motion.div variants={{ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } }} className="space-y-4">
+      {/* Revenue summary */}
+      <div className="elite-card rounded-2xl p-5">
+        <h3 className="text-[13px] font-semibold text-white/60 mb-4">My NFAs Portfolio</h3>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+            <DollarSign className="w-3.5 h-3.5 text-emerald-400/50 mb-1" />
+            <div className="text-[15px] font-bold text-white/80">{totalRevenue.toFixed(1)} SOL</div>
+            <div className="text-[9px] text-white/25 uppercase">Revenue</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+            <TrendingUp className="w-3.5 h-3.5 text-amber-400/50 mb-1" />
+            <div className="text-[15px] font-bold text-white/80">{portfolioValue.toFixed(1)} SOL</div>
+            <div className="text-[9px] text-white/25 uppercase">Portfolio Value</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+            <Star className="w-3.5 h-3.5 text-amber-400/50 mb-1" />
+            <div className="text-[15px] font-bold text-white/80">{ownedAgents.length}</div>
+            <div className="text-[9px] text-white/25 uppercase">NFAs Owned</div>
+          </div>
+        </div>
+        {/* Agent cards */}
+        <div className="space-y-2">
+          {ownedAgents.map(agent => (
+            <Link key={agent.id} href={`/chat/${agent.id}`} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all group">
+              <AgentAvatar agent={agent} size="sm" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] font-semibold text-white/70 group-hover:text-white/90 transition-colors">{agent.name}</span>
+                  <span className={`text-[8px] px-1.5 py-0.5 rounded-full ${RARITY_CONFIG[agent.rarity].color} ${RARITY_CONFIG[agent.rarity].bg}`}>{agent.rarity}</span>
+                </div>
+                <span className="text-[10px] text-white/25">{agent.category} · {agent.revenueGenerated} SOL earned</span>
+              </div>
+              <span className="text-[10px] text-amber-400/40 group-hover:text-amber-400/70 transition-colors">Chat →</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -308,6 +369,9 @@ export default function DashboardPage() {
                     </div>
                   </motion.div>
                 )}
+
+                {/* My NFAs */}
+                <MyNFAsSection />
 
                 {/* Quick actions */}
                 <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
