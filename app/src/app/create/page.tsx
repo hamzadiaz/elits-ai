@@ -39,46 +39,41 @@ function TagSelector({ options, selected, onToggle, label }: {
   const [custom, setCustom] = useState('')
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-400 mb-3">{label}</label>
-      <div className="flex flex-wrap gap-2 mb-3">
+      <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-3">{label}</label>
+      <div className="flex flex-wrap gap-1.5 mb-3">
         {options.map(opt => (
           <button
             key={opt}
             onClick={() => onToggle(opt)}
-            className={`px-3.5 py-1.5 rounded-lg text-sm transition-all duration-200 ${
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-300 cursor-pointer ${
               selected.includes(opt)
-                ? 'bg-primary/20 text-primary-light border border-primary/40 shadow-[0_0_10px_rgba(124,58,237,0.1)]'
-                : 'bg-white/[0.03] border border-white/[0.06] text-gray-500 hover:text-gray-300 hover:border-white/[0.12]'
+                ? 'bg-gold/[0.12] text-gold-light/80 border border-gold/[0.2] shadow-[0_0_15px_rgba(212,160,23,0.05)]'
+                : 'bg-white/[0.02] border border-white/[0.04] text-white/25 hover:text-white/40 hover:border-white/[0.08]'
             }`}
           >
-            {selected.includes(opt) && <Check className="w-3 h-3 inline mr-1" />}
+            {selected.includes(opt) && <Check className="w-2.5 h-2.5 inline mr-1" />}
             {opt}
           </button>
         ))}
       </div>
-      <div className="flex gap-2">
-        <input
-          value={custom}
-          onChange={e => setCustom(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && custom.trim()) {
-              onToggle(custom.trim())
-              setCustom('')
-            }
-          }}
-          placeholder="Add custom..."
-          className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_20px_rgba(124,58,237,0.08)] transition-all"
-        />
-      </div>
+      <input
+        value={custom}
+        onChange={e => setCustom(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && custom.trim()) { onToggle(custom.trim()); setCustom('') }
+        }}
+        placeholder="Add custom..."
+        className="elite-input w-full"
+      />
     </div>
   )
 }
 
 const stepInfo = [
-  { icon: User, label: 'Identity', desc: 'Name & Bio' },
-  { icon: Zap, label: 'Skills', desc: 'Skills & Interests' },
-  { icon: Heart, label: 'Values', desc: 'Values & Style' },
-  { icon: MessageSquare, label: 'Review', desc: 'Confirm & Create' },
+  { icon: User, label: 'Identity' },
+  { icon: Zap, label: 'Skills' },
+  { icon: Heart, label: 'Values' },
+  { icon: MessageSquare, label: 'Review' },
 ]
 
 export default function CreateElitPage() {
@@ -102,14 +97,10 @@ export default function CreateElitPage() {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
-    // Show preview immediately
     const reader = new FileReader()
     reader.onload = async (ev) => {
       const dataUrl = ev.target?.result as string
       setAvatarPreview(dataUrl)
-
-      // Try to generate avatar via Gemini
       setGeneratingAvatar(true)
       try {
         const base64 = dataUrl.split(',')[1]
@@ -125,7 +116,6 @@ export default function CreateElitPage() {
         }
       } catch (err) {
         console.error('Avatar generation failed:', err)
-        // Keep original preview
         setProfile(p => ({ ...p, avatarUrl: dataUrl }))
       } finally {
         setGeneratingAvatar(false)
@@ -142,28 +132,26 @@ export default function CreateElitPage() {
       localStorage.setItem('elitProfile', JSON.stringify(profile))
       localStorage.setItem('elitHash', personalityHash)
       setStep(4)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setCreating(false)
-    }
+    } catch (err) { console.error(err) }
+    finally { setCreating(false) }
   }
 
   if (!connected) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center max-w-md">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-blue/20 border border-white/[0.08] flex items-center justify-center mx-auto mb-8">
-            <Wallet className="w-8 h-8 text-primary-light" />
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-8">
+            <Wallet className="w-7 h-7 text-gold-light/40" />
           </div>
-          <h1 className="text-3xl font-bold gradient-text-white mb-3">Connect Your Wallet</h1>
-          <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+          <h1 className="text-2xl font-bold gradient-text-white mb-3">Connect Your Wallet</h1>
+          <p className="text-white/20 mb-8 text-[13px] font-light leading-relaxed">
             Connect your Solana wallet to create your Elit. Your wallet address becomes your on-chain identity.
           </p>
           <WalletMultiButton style={{
-            background: 'linear-gradient(135deg, #7c3aed, #3b82f6)',
-            borderRadius: '14px', fontSize: '15px', fontWeight: '600', height: '48px', padding: '0 28px', border: 'none',
-            boxShadow: '0 0 30px rgba(124, 58, 237, 0.2)',
+            background: 'rgba(212, 160, 23, 0.15)',
+            border: '0.5px solid rgba(212, 160, 23, 0.25)',
+            borderRadius: '14px', fontSize: '13px', fontWeight: '500', height: '44px', padding: '0 24px',
+            color: '#f0c940',
           }} />
         </motion.div>
       </div>
@@ -171,110 +159,98 @@ export default function CreateElitPage() {
   }
 
   const steps = [
-    // Step 0: Name & Bio & Photo
-    <motion.div key="basics" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.4 }}>
-      <h2 className="text-2xl font-bold gradient-text-white mb-1">Who Are You?</h2>
-      <p className="text-gray-600 text-sm mb-8">Let&apos;s start with the basics.</p>
-      <div className="space-y-6">
+    // Step 0: Identity
+    <motion.div key="basics" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
+      <h2 className="text-xl font-bold gradient-text-white mb-1">Who Are You?</h2>
+      <p className="text-white/15 text-[13px] mb-8 font-light">Let&apos;s start with the basics.</p>
+      <div className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+          <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-2">Name</label>
           <input
             value={profile.name}
             onChange={e => setProfile(p => ({ ...p, name: e.target.value }))}
             placeholder="Your name or alias"
-            className="w-full px-5 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder-gray-600 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all text-base"
+            className="elite-input w-full"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">Bio</label>
+          <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-2">Bio</label>
           <textarea
             value={profile.bio}
             onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
             placeholder="A brief description of who you are..."
             rows={3}
-            className="w-full px-5 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder-gray-600 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all resize-none text-base"
+            className="elite-input w-full resize-none"
           />
         </div>
-        {/* Avatar upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">Profile Photo → 3D Avatar</label>
+          <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-2">Profile Photo → 3D Avatar</label>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-          
           {avatarPreview ? (
             <div className="flex items-center gap-6">
               <div className="relative">
                 <Avatar3D avatarUrl={avatarPreview} name={profile.name || '?'} size="lg" state={generatingAvatar ? 'thinking' : 'idle'} />
                 {generatingAvatar && (
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 border border-primary/30">
-                    <Loader2 className="w-3 h-3 text-primary-light animate-spin" />
-                    <span className="text-[10px] text-primary-light">Generating avatar...</span>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/[0.1] border border-gold/[0.15]">
+                    <Loader2 className="w-2.5 h-2.5 text-gold-light/60 animate-spin" />
+                    <span className="text-[10px] text-gold-light/50">Generating...</span>
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-sm text-gray-400 mb-2">
-                  {generatingAvatar ? 'Creating your AI avatar...' : 'Your AI Avatar'}
-                </p>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-xs text-primary-light hover:text-primary transition-colors"
-                >
-                  Change photo
-                </button>
+                <p className="text-[13px] text-white/25 mb-2">{generatingAvatar ? 'Creating avatar...' : 'Your AI Avatar'}</p>
+                <button onClick={() => fileInputRef.current?.click()} className="text-[11px] text-gold-light/40 hover:text-gold-light/60 transition-colors cursor-pointer">Change photo</button>
               </div>
             </div>
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-white/[0.06] rounded-2xl p-8 text-center hover:border-primary/30 transition-colors cursor-pointer group"
+              className="border border-dashed border-white/[0.04] rounded-2xl p-8 text-center hover:border-gold/[0.12] transition-all duration-500 cursor-pointer group"
             >
-              <Upload className="w-8 h-8 text-gray-600 mx-auto mb-3 group-hover:text-primary/60 transition-colors" />
-              <p className="text-sm text-gray-600">Upload a photo to generate your 3D avatar</p>
-              <p className="text-xs text-gray-700 mt-1">PNG, JPG up to 5MB • AI will transform it</p>
+              <Upload className="w-7 h-7 text-white/10 mx-auto mb-3 group-hover:text-gold/30 transition-colors duration-500" />
+              <p className="text-[13px] text-white/20 font-light">Upload a photo to generate your 3D avatar</p>
+              <p className="text-[11px] text-white/10 mt-1">PNG, JPG up to 5MB</p>
             </div>
           )}
         </div>
       </div>
     </motion.div>,
 
-    // Step 1: Skills & Interests
-    <motion.div key="skills" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.4 }}>
-      <h2 className="text-2xl font-bold gradient-text-white mb-1">Skills & Interests</h2>
-      <p className="text-gray-600 text-sm mb-8">What do you know? What excites you?</p>
+    // Step 1: Skills
+    <motion.div key="skills" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
+      <h2 className="text-xl font-bold gradient-text-white mb-1">Skills & Interests</h2>
+      <p className="text-white/15 text-[13px] mb-8 font-light">What do you know? What excites you?</p>
       <div className="space-y-8">
         <TagSelector options={skillSuggestions} selected={profile.skills} onToggle={t => toggleTag('skills', t)} label="Your Skills & Expertise" />
         <TagSelector options={interestSuggestions} selected={profile.interests} onToggle={t => toggleTag('interests', t)} label="Your Interests" />
       </div>
     </motion.div>,
 
-    // Step 2: Values & Style
-    <motion.div key="values" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.4 }}>
-      <h2 className="text-2xl font-bold gradient-text-white mb-1">Values & Style</h2>
-      <p className="text-gray-600 text-sm mb-8">How do you communicate? What matters to you?</p>
+    // Step 2: Values
+    <motion.div key="values" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
+      <h2 className="text-xl font-bold gradient-text-white mb-1">Values & Style</h2>
+      <p className="text-white/15 text-[13px] mb-8 font-light">How do you communicate? What matters to you?</p>
       <div className="space-y-8">
         <TagSelector options={valueSuggestions} selected={profile.values} onToggle={t => toggleTag('values', t)} label="Core Values" />
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-3">Communication Style</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <label className="block text-[12px] font-medium text-white/25 uppercase tracking-wider mb-3">Communication Style</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { label: 'Formality', field: 'formality' as const, options: ['casual', 'balanced', 'formal'] },
               { label: 'Humor', field: 'humor' as const, options: ['dry', 'playful', 'serious'] },
               { label: 'Detail Level', field: 'verbosity' as const, options: ['concise', 'balanced', 'detailed'] },
             ].map(({ label, field, options }) => (
-              <div key={field} className="gradient-border rounded-xl p-4">
-                <p className="text-xs text-gray-600 mb-2 font-medium">{label}</p>
-                <div className="space-y-1.5">
+              <div key={field} className="elite-card rounded-xl p-4">
+                <p className="text-[10px] text-white/15 mb-2.5 font-medium uppercase tracking-wider">{label}</p>
+                <div className="space-y-1">
                   {options.map(opt => (
                     <button
                       key={opt}
-                      onClick={() => setProfile(p => ({
-                        ...p,
-                        communicationStyle: { ...p.communicationStyle, [field]: opt },
-                      }))}
-                      className={`w-full px-3 py-2 rounded-lg text-sm text-left transition-all duration-200 ${
+                      onClick={() => setProfile(p => ({ ...p, communicationStyle: { ...p.communicationStyle, [field]: opt } }))}
+                      className={`w-full px-3 py-2 rounded-lg text-[12px] text-left transition-all duration-300 cursor-pointer ${
                         profile.communicationStyle[field] === opt
-                          ? 'bg-primary/20 text-primary-light border border-primary/40'
-                          : 'bg-white/[0.02] text-gray-500 hover:bg-white/[0.05] border border-transparent'
+                          ? 'bg-gold/[0.1] text-gold-light/70 border border-gold/[0.15]'
+                          : 'bg-white/[0.01] text-white/25 hover:bg-white/[0.03] border border-transparent'
                       }`}
                     >
                       {opt.charAt(0).toUpperCase() + opt.slice(1)}
@@ -289,34 +265,32 @@ export default function CreateElitPage() {
     </motion.div>,
 
     // Step 3: Review
-    <motion.div key="review" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.4 }}>
-      <h2 className="text-2xl font-bold gradient-text-white mb-1">Review Your Elit</h2>
-      <p className="text-gray-600 text-sm mb-8">Everything look right? Let&apos;s bring it to life.</p>
-      <div className="gradient-border rounded-2xl p-6 space-y-5">
+    <motion.div key="review" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.5 }}>
+      <h2 className="text-xl font-bold gradient-text-white mb-1">Review Your Elit</h2>
+      <p className="text-white/15 text-[13px] mb-8 font-light">Everything look right?</p>
+      <div className="elite-card rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-4">
           <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="md" />
           <div>
-            <p className="text-white font-semibold text-lg">{profile.name || 'Unnamed'}</p>
-            <p className="text-gray-500 text-sm font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}</p>
+            <p className="text-white/90 font-semibold text-base">{profile.name || 'Unnamed'}</p>
+            <p className="text-white/15 text-[12px] font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}</p>
           </div>
         </div>
-        <div className="h-px bg-white/[0.04]" />
+        <div className="h-px bg-white/[0.03]" />
         <div>
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">Bio</p>
-          <p className="text-gray-400 text-sm">{profile.bio || '—'}</p>
+          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1">Bio</p>
+          <p className="text-white/30 text-[13px] font-light">{profile.bio || '—'}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-2">Skills</p>
+          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-2">Skills</p>
           <div className="flex flex-wrap gap-1.5">
-            {profile.skills.map(s => (
-              <span key={s} className="px-2.5 py-1 rounded-lg bg-primary/15 text-primary-light text-xs border border-primary/20">{s}</span>
-            ))}
-            {profile.skills.length === 0 && <span className="text-gray-600 text-sm">None selected</span>}
+            {profile.skills.map(s => <span key={s} className="elite-tag text-[11px]">{s}</span>)}
+            {profile.skills.length === 0 && <span className="text-white/15 text-[13px]">None selected</span>}
           </div>
         </div>
         <div>
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">Style</p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1">Style</p>
+          <p className="text-white/30 text-[13px] font-light">
             {profile.communicationStyle.formality} · {profile.communicationStyle.humor} · {profile.communicationStyle.verbosity}
           </p>
         </div>
@@ -324,33 +298,21 @@ export default function CreateElitPage() {
     </motion.div>,
 
     // Step 4: Success
-    <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center">
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', bounce: 0.5, delay: 0.2 }}
-        className="mb-6"
-      >
+    <motion.div key="success" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="text-center">
+      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', bounce: 0.4, delay: 0.2 }} className="mb-6">
         <Avatar3D avatarUrl={avatarPreview || profile.avatarUrl} name={profile.name || '?'} size="xl" state="speaking" />
       </motion.div>
-      <h2 className="text-3xl font-bold gradient-text-white mb-3">Elit Created!</h2>
-      <p className="text-gray-500 mb-6 text-sm">Your personality hash has been generated. Now train your Elit to make it truly you.</p>
-      <div className="gradient-border rounded-xl p-4 mb-8 max-w-md mx-auto">
-        <p className="text-xs text-gray-600 mb-1">Personality Hash (SHA-256)</p>
-        <p className="text-primary-light font-mono text-xs break-all">{hash}</p>
+      <h2 className="text-2xl font-bold gradient-text-white mb-3">Elit Created</h2>
+      <p className="text-white/20 mb-6 text-[13px] font-light">Your personality hash has been generated. Train your Elit to make it truly you.</p>
+      <div className="elite-card rounded-xl p-4 mb-8 max-w-md mx-auto">
+        <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1.5">Personality Hash (SHA-256)</p>
+        <p className="text-gold-light/50 font-mono text-[11px] break-all">{hash}</p>
       </div>
-      <div className="flex gap-4 justify-center">
-        <button
-          onClick={() => router.push('/train')}
-          className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-primary-dark to-blue text-white font-semibold btn-glow hover:scale-[1.02] transition-transform"
-        >
-          Train Your Elit
-          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      <div className="flex gap-3 justify-center">
+        <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
+          Train Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
         </button>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="px-8 py-3.5 rounded-xl border border-white/[0.08] bg-white/[0.02] text-gray-400 font-medium hover:text-white hover:border-white/[0.15] transition-all"
-        >
+        <button onClick={() => router.push('/dashboard')} className="px-7 py-3 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/30 font-medium text-[13px] hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer">
           Dashboard
         </button>
       </div>
@@ -364,17 +326,17 @@ export default function CreateElitPage() {
           <div className="flex items-center gap-3 mb-10">
             {stepInfo.map((s, i) => (
               <div key={i} className="flex items-center gap-3 flex-1">
-                <div className={`flex items-center gap-2 transition-all duration-300 ${i <= step ? 'opacity-100' : 'opacity-30'}`}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                    i < step ? 'bg-primary/20 border border-primary/40'
-                      : i === step ? 'bg-gradient-to-br from-primary-dark to-blue shadow-[0_0_20px_rgba(124,58,237,0.2)]'
-                        : 'bg-white/[0.03] border border-white/[0.06]'
+                <div className={`flex items-center gap-2 transition-all duration-500 ${i <= step ? 'opacity-100' : 'opacity-20'}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-500 ${
+                    i < step ? 'bg-gold/[0.1] border border-gold/[0.15]'
+                      : i === step ? 'bg-gradient-to-br from-gold-dark to-gold shadow-[0_0_25px_rgba(212,160,23,0.1)]'
+                        : 'bg-white/[0.02] border border-white/[0.04]'
                   }`}>
-                    {i < step ? <Check className="w-3.5 h-3.5 text-primary-light" /> : <s.icon className="w-3.5 h-3.5 text-white/70" />}
+                    {i < step ? <Check className="w-3 h-3 text-gold-light/60" /> : <s.icon className="w-3 h-3 text-white/50" />}
                   </div>
-                  <span className="text-xs text-gray-500 hidden sm:block">{s.label}</span>
+                  <span className="text-[11px] text-white/20 hidden sm:block">{s.label}</span>
                 </div>
-                {i < 3 && <div className={`flex-1 h-px transition-all duration-300 ${i < step ? 'bg-primary/40' : 'bg-white/[0.04]'}`} />}
+                {i < 3 && <div className={`flex-1 h-px transition-all duration-500 ${i < step ? 'bg-gold/[0.2]' : 'bg-white/[0.03]'}`} />}
               </div>
             ))}
           </div>
@@ -386,28 +348,28 @@ export default function CreateElitPage() {
           <div className="flex justify-between mt-10">
             <button
               onClick={() => setStep(s => Math.max(0, s - 1))}
-              className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/[0.06] bg-white/[0.02] text-gray-500 hover:text-white hover:border-white/[0.12] transition-all ${step === 0 ? 'invisible' : ''}`}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/25 hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer ${step === 0 ? 'invisible' : ''}`}
             >
-              <ChevronLeft className="w-4 h-4" /> Back
+              <ChevronLeft className="w-3.5 h-3.5" /> Back
             </button>
             {step < 3 ? (
               <button
                 onClick={() => setStep(s => s + 1)}
                 disabled={step === 0 && !profile.name}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-dark to-blue text-white font-semibold disabled:opacity-30 hover:scale-[1.02] transition-transform"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] disabled:opacity-20 hover:scale-[1.02] transition-all cursor-pointer"
               >
-                Continue <ChevronRight className="w-4 h-4" />
+                Continue <ChevronRight className="w-3.5 h-3.5 opacity-50" />
               </button>
             ) : (
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="group inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary-dark via-primary to-blue text-white font-bold btn-glow hover:scale-[1.02] transition-transform disabled:opacity-50"
+                className="group inline-flex items-center gap-2 px-8 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.02] transition-all disabled:opacity-40 cursor-pointer"
               >
                 {creating ? (
-                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Creating...</>
+                  <><div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" /> Creating...</>
                 ) : (
-                  <><Sparkles className="w-4 h-4" /> Create Elit</>
+                  <><Sparkles className="w-3.5 h-3.5 opacity-60" /> Create Elit</>
                 )}
               </button>
             )}

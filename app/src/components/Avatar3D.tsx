@@ -42,10 +42,10 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
         }}
         style={{
           background: state === 'speaking'
-            ? 'radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%)'
+            ? 'radial-gradient(circle, rgba(212,160,23,0.4) 0%, transparent 70%)'
             : state === 'thinking'
-              ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
-              : 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+              ? 'radial-gradient(circle, rgba(240,201,64,0.3) 0%, transparent 70%)'
+              : 'radial-gradient(circle, rgba(212,160,23,0.15) 0%, transparent 70%)',
         }}
       />
 
@@ -60,7 +60,7 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
 
       {/* Main avatar container */}
       <motion.div
-        className={`relative ${s.container} rounded-full overflow-hidden border-2 border-primary/30 shadow-[0_0_30px_rgba(124,58,237,0.2)]`}
+        className={`relative ${s.container} rounded-full overflow-hidden border-2 border-primary/30 shadow-[0_0_30px_rgba(212,160,23,0.2)]`}
         animate={
           state === 'idle'
             ? { y: [0, -4, 0] }
@@ -92,9 +92,9 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
           className="absolute inset-0 rounded-full pointer-events-none"
           animate={{
             background: [
-              'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, transparent 50%, rgba(59,130,246,0.1) 100%)',
-              'linear-gradient(225deg, rgba(124,58,237,0.1) 0%, transparent 50%, rgba(59,130,246,0.1) 100%)',
-              'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, transparent 50%, rgba(59,130,246,0.1) 100%)',
+              'linear-gradient(135deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
+              'linear-gradient(225deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
+              'linear-gradient(135deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
             ],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
