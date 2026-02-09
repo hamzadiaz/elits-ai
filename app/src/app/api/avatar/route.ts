@@ -28,6 +28,60 @@ MOOD: Ethereal, powerful, futuristic — like a sentient AI that emerged from go
 
 Output ONLY the image, no text overlay.`
 
+// Models that support image generation output, in order of preference
+const IMAGE_MODELS = [
+  'gemini-2.5-flash-image',
+  'gemini-3-pro-image-preview',
+]
+
+async function tryGenerateWithModel(model: string, mimeType: string, imageData: string): Promise<{ avatarUrl: string; generated: boolean; message: string } | null> {
+  console.log(`[avatar] Trying model: ${model}`)
+  
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { inlineData: { mimeType, data: imageData } },
+            { text: AVATAR_STYLE_PROMPT },
+          ],
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE', 'TEXT'],
+          temperature: 1,
+        },
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const errText = await response.text()
+    console.error(`[avatar] Model ${model} failed (${response.status}):`, errText.slice(0, 200))
+    return null
+  }
+
+  const data = await response.json()
+  console.log(`[avatar] Model ${model} response candidates:`, data.candidates?.length || 0)
+  
+  const parts = data.candidates?.[0]?.content?.parts || []
+  for (const part of parts) {
+    if (part.inlineData?.data) {
+      console.log(`[avatar] Model ${model} returned image! MIME: ${part.inlineData.mimeType}, size: ${part.inlineData.data.length}`)
+      return {
+        avatarUrl: `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`,
+        generated: true,
+        message: 'AI-generated Holographic Neural Portrait',
+      }
+    }
+  }
+
+  console.log(`[avatar] Model ${model} returned no image data in parts:`, parts.map((p: Record<string, unknown>) => Object.keys(p)))
+  return null
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { image, mimeType } = await req.json()
@@ -37,6 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!GEMINI_API_KEY) {
+      console.log('[avatar] No GEMINI_API_KEY configured')
       return NextResponse.json({
         avatarUrl: `data:${mimeType};base64,${image}`,
         generated: false,
@@ -44,92 +99,28 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Try Gemini 2.0 Flash for image generation
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { inlineData: { mimeType, data: image } },
-              { text: AVATAR_STYLE_PROMPT },
-            ],
-          }],
-          generationConfig: {
-            responseModalities: ['IMAGE', 'TEXT'],
-            temperature: 1,
-          },
-        }),
-      }
-    )
-
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error('Gemini avatar generation failed:', errText)
-      
-      // Try with gemini-2.0-flash as fallback
-      const fallbackResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { inlineData: { mimeType, data: image } },
-                { text: AVATAR_STYLE_PROMPT },
-              ],
-            }],
-            generationConfig: {
-              responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 1,
-            },
-          }),
+    // Try each image generation model
+    for (const model of IMAGE_MODELS) {
+      try {
+        const result = await tryGenerateWithModel(model, mimeType, image)
+        if (result) {
+          return NextResponse.json(result)
         }
-      )
-
-      if (fallbackResponse.ok) {
-        const data = await fallbackResponse.json()
-        const parts = data.candidates?.[0]?.content?.parts || []
-        for (const part of parts) {
-          if (part.inlineData?.data) {
-            return NextResponse.json({
-              avatarUrl: `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`,
-              generated: true,
-              message: 'AI-generated Holographic Neural Portrait',
-            })
-          }
-        }
-      }
-
-      return NextResponse.json({
-        avatarUrl: `data:${mimeType};base64,${image}`,
-        generated: false,
-        message: 'Using original photo with holographic CSS effects',
-      })
-    }
-
-    const data = await response.json()
-    const parts = data.candidates?.[0]?.content?.parts || []
-    for (const part of parts) {
-      if (part.inlineData?.data) {
-        return NextResponse.json({
-          avatarUrl: `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`,
-          generated: true,
-          message: 'AI-generated Holographic Neural Portrait',
-        })
+      } catch (err) {
+        console.error(`[avatar] Error with model ${model}:`, err)
+        continue
       }
     }
 
+    // All models failed — fallback to original photo
+    console.log('[avatar] All image models failed, returning original photo')
     return NextResponse.json({
       avatarUrl: `data:${mimeType};base64,${image}`,
       generated: false,
-      message: 'Using original photo with holographic CSS effects',
+      message: 'Image generation unavailable. Using original photo with holographic CSS effects.',
     })
   } catch (error) {
-    console.error('Avatar generation error:', error)
+    console.error('[avatar] Avatar generation error:', error)
     return NextResponse.json({ error: 'Failed to generate avatar' }, { status: 500 })
   }
 }
