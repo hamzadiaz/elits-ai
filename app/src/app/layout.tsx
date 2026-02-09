@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Elits AI — Verified AI Agents on Solana',
@@ -29,11 +29,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Elits AI — Verified AI Agents on Solana',
     description: 'Train it by voice. Let it act for you. Verified on-chain.',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: '/favicon.png',
+    apple: '/favicon.png',
   },
   metadataBase: new URL('https://elits-ai.vercel.app'),
 }
