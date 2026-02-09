@@ -105,10 +105,10 @@ const features = [
 ]
 
 const steps = [
-  { num: '01', title: 'Connect Wallet', desc: 'Link your Solana wallet to establish your cryptographic identity.', icon: Fingerprint },
-  { num: '02', title: 'Create Your Elit', desc: 'Define your personality, skills, interests, and communication style.', icon: Brain },
-  { num: '03', title: 'Train by Talking', desc: 'Have conversations. Your Elit gets smarter with every interaction.', icon: Mic },
-  { num: '04', title: 'Deploy & Verify', desc: 'Personality hash goes on-chain. Your Elit is live and verifiable globally.', icon: Globe },
+  { num: '01', title: 'Create or Browse', desc: 'Build from scratch or fork a template from the marketplace. Connect your Solana wallet.', icon: Fingerprint },
+  { num: '02', title: 'Train Your Agent', desc: 'Chat or call your Elit via Gemini Live. It learns your knowledge, personality, and style.', icon: Mic },
+  { num: '03', title: 'Level Up', desc: 'Earn XP, unlock milestones, and watch your agent\'s capabilities grow with every interaction.', icon: Brain },
+  { num: '04', title: 'Deploy & Verify', desc: 'Personality hash goes on-chain. Your Elit is live, verifiable, and acting on your behalf.', icon: Globe },
 ]
 
 const stats = [
@@ -313,8 +313,9 @@ export default function LandingPage() {
             </p>
           </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
+              { href: '/explore', icon: Globe, title: 'Browse Marketplace', desc: 'Explore verified agents and templates across 6 categories.' },
               { href: '/create', icon: Sparkles, title: 'Create Your Elit', desc: 'Define your personality and generate a 3D avatar in 4 easy steps.' },
               { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your agent your skills.' },
               { href: '/turing', icon: Eye, title: 'Take the Turing Test', desc: 'Can you tell the AI from the human? 5 rounds, blind comparison.' },

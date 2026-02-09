@@ -8,7 +8,9 @@ import { ChatInterface } from '@/components/ChatInterface'
 import { VoiceTrainer } from '@/components/VoiceTrainer'
 import { Avatar3D } from '@/components/Avatar3D'
 import { generatePersonalityHash, generateSystemPrompt, addTrainingSession, type PersonalityProfile } from '@/lib/personality'
-import { Mic, Wallet, Brain, Sparkles, ChevronRight, Zap, MessageSquare, Target, Phone } from 'lucide-react'
+import { Mic, Wallet, Brain, Sparkles, ChevronRight, Zap, MessageSquare, Target, Phone, Trophy, CheckCircle2 } from 'lucide-react'
+import { XPBar } from '@/components/XPBar'
+import { calculateXP } from '@/lib/xp'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -205,6 +207,37 @@ export default function TrainPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* XP Progress */}
+        <div>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-medium mb-3">Agent Level</p>
+          <XPBar xp={calculateXP(profile)} compact={false} />
+        </div>
+
+        {/* Training Milestones */}
+        <div>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-medium mb-3">Training Goals</p>
+          <div className="space-y-2">
+            {[
+              { label: 'Share your background', done: userMsgCount >= 1 || profile.trainingMessages.length > 0, desc: 'Tell about yourself' },
+              { label: 'Discuss your expertise', done: userMsgCount >= 3, desc: 'Share your skills' },
+              { label: 'Calibrate your style', done: userMsgCount >= 5, desc: 'Define how you communicate' },
+              { label: 'Complete training', done: trainingComplete || !!hash, desc: 'Finalize personality model' },
+            ].map((milestone, i) => (
+              <div key={i} className={`flex items-center gap-2 p-2 rounded-lg transition-all ${milestone.done ? 'bg-emerald-400/[0.04]' : 'bg-white/[0.02]'}`}>
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                  milestone.done ? 'bg-emerald-400/20 text-emerald-400/80' : 'bg-white/[0.04] text-white/15'
+                }`}>
+                  {milestone.done ? <CheckCircle2 className="w-3 h-3" /> : <span className="text-[8px] font-bold">{i + 1}</span>}
+                </div>
+                <div>
+                  <p className={`text-[10px] font-medium ${milestone.done ? 'text-white/50' : 'text-white/30'}`}>{milestone.label}</p>
+                  <p className="text-[8px] text-white/15">{milestone.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {profile.skills.length > 0 && (
