@@ -206,7 +206,7 @@ export function VoiceTrainer({ elitName, avatarUrl, onTranscriptUpdate }: VoiceT
           </AnimatePresence>
 
           {/* Transcript */}
-          <div className="w-full mt-6 h-40 overflow-y-auto rounded-xl bg-white/[0.02] border border-white/[0.04] p-3">
+          <div className="w-full mt-6 h-40 overflow-y-auto rounded-xl bg-white/[0.02] border border-white/[0.08] p-3">
             {transcript.length === 0 ? (
               <p className="text-xs text-gray-600 text-center mt-12">Conversation will appear here...</p>
             ) : (

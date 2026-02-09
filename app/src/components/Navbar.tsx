@@ -39,7 +39,7 @@ export function Navbar() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
           scrolled
-            ? 'bg-black/40 backdrop-blur-3xl border-b border-white/[0.03] shadow-[0_4px_60px_rgba(0,0,0,0.5)]'
+            ? 'bg-black/40 backdrop-blur-3xl border-b border-white/[0.06] shadow-[0_4px_60px_rgba(0,0,0,0.5)]'
             : 'bg-transparent'
         }`}
       >
@@ -47,9 +47,9 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-7 h-7 rounded-lg bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center overflow-hidden">
+              <div className="relative w-7 h-7 rounded-lg bg-gradient-to-br from-amber-600 to-amber-500 flex items-center justify-center overflow-hidden">
                 <Zap className="w-3.5 h-3.5 text-white/90 relative z-10" fill="currentColor" />
-                <div className="absolute inset-0 bg-gradient-to-br from-gold to-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-amber-500-light opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
               <span className="font-semibold text-base tracking-tight">
                 <span className="text-white/90">Elits</span>
@@ -66,13 +66,13 @@ export function Navbar() {
                   className={`relative px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 ${
                     pathname === link.href
                       ? 'text-white/90'
-                      : 'text-white/30 hover:text-white/60'
+                      : 'text-white/55 hover:text-white/60'
                   }`}
                 >
                   {pathname === link.href && (
                     <motion.div
                       layoutId="nav-active"
-                      className="absolute inset-0 bg-white/[0.04] rounded-lg border border-white/[0.04]"
+                      className="absolute inset-0 bg-white/[0.04] rounded-lg border border-white/[0.08]"
                       transition={{ type: 'spring', bounce: 0.15, duration: 0.6 }}
                     />
                   )}
@@ -97,7 +97,7 @@ export function Navbar() {
                 letterSpacing: '0.01em',
               }} />
               <button
-                className="md:hidden text-white/30 hover:text-white/60 transition-colors"
+                className="md:hidden text-white/55 hover:text-white/60 transition-colors"
                 onClick={() => setMobileOpen(!mobileOpen)}
               >
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -123,7 +123,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-              className="absolute right-0 top-0 bottom-0 w-72 bg-[#060608] border-l border-white/[0.03] p-6 pt-20"
+              className="absolute right-0 top-0 bottom-0 w-72 bg-[#060608] border-l border-white/[0.06] p-6 pt-20"
             >
               <div className="space-y-1">
                 {links.map((link, i) => (
@@ -138,8 +138,8 @@ export function Navbar() {
                       onClick={() => setMobileOpen(false)}
                       className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
                         pathname === link.href
-                          ? 'text-white/90 bg-white/[0.04] border border-white/[0.04]'
-                          : 'text-white/30 hover:text-white/60 hover:bg-white/[0.02]'
+                          ? 'text-white/90 bg-white/[0.04] border border-white/[0.08]'
+                          : 'text-white/55 hover:text-white/60 hover:bg-white/[0.02]'
                       }`}
                     >
                       {link.label}

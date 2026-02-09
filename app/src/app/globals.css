@@ -12,9 +12,9 @@
   --color-surface-lighter: #0c0c08;
   --color-surface-card: #0a0a06;
   --color-glow: #d4a017;
-  --color-gold: #d4a017;
-  --color-gold-light: #f0c940;
-  --color-gold-dark: #b8860b;
+  --color-amber: #d4a017;
+  --color-amber-light: #f0c940;
+  --color-amber-dark: #b8860b;
   --color-amber: #f59e0b;
 }
 
@@ -51,21 +51,20 @@ body {
 /* Elite card with ultra-thin border */
 .elite-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 0.5px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .elite-card:hover {
-  border-color: rgba(212, 160, 23, 0.15);
-  background: rgba(255, 255, 255, 0.025);
+  border-color: rgba(212, 160, 23, 0.2);
+  background: rgba(255, 255, 255, 0.035);
   box-shadow: 
-    0 0 80px rgba(212, 160, 23, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 0 60px rgba(212, 160, 23, 0.01);
+    0 0 60px rgba(212, 160, 23, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Gradient border card — luxury variant */
@@ -240,6 +239,99 @@ body {
 
 .btn-glow:hover::after {
   opacity: 0.4;
+}
+
+/* ──── BEAM BORDER (rotating conic gradient) ──── */
+@keyframes beam-rotate {
+  0% { --beam-angle: 0deg; }
+  100% { --beam-angle: 360deg; }
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.beam-border {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.beam-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 20px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    transparent 70%,
+    rgba(212, 160, 23, 0.5) 78%,
+    rgba(240, 201, 64, 0.8) 82%,
+    rgba(212, 160, 23, 0.5) 86%,
+    transparent 94%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: beam-rotate 4s linear infinite;
+}
+
+.beam-border:hover::before {
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    transparent 60%,
+    rgba(212, 160, 23, 0.6) 72%,
+    rgba(240, 201, 64, 1) 80%,
+    rgba(212, 160, 23, 0.6) 88%,
+    transparent 96%,
+    transparent 100%
+  );
+}
+
+/* Beam border for buttons (smaller radius) */
+.beam-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.beam-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 12px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    transparent 65%,
+    rgba(212, 160, 23, 0.6) 76%,
+    rgba(240, 201, 64, 1) 82%,
+    rgba(212, 160, 23, 0.6) 88%,
+    transparent 96%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: beam-rotate 3s linear infinite;
+}
+
+/* Beam border paused, plays on hover */
+.beam-border-hover::before {
+  animation-play-state: paused;
+}
+.beam-border-hover:hover::before {
+  animation-play-state: running;
 }
 
 /* ──── SELECTION ──── */

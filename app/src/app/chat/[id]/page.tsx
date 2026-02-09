@@ -105,7 +105,7 @@ export default function ChatWithElitPage() {
                 { icon: Code, label: 'Code' },
                 { icon: Search, label: 'Research' },
               ].map(scope => (
-                <span key={scope.label} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.04]">
+                <span key={scope.label} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
                   <scope.icon className="w-2.5 h-2.5 text-gray-500" />
                   <span className="text-[9px] text-gray-500">{scope.label}</span>
                 </span>
@@ -130,7 +130,7 @@ export default function ChatWithElitPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2 mt-2 ml-12"
           >
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.04]">
+            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08]">
               <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" />
               <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
               <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
@@ -193,7 +193,7 @@ export default function ChatWithElitPage() {
         )}
       </AnimatePresence>
 
-      <div className="flex-1 mx-4 my-2 rounded-2xl overflow-hidden border border-white/[0.04]">
+      <div className="flex-1 mx-4 my-2 rounded-2xl overflow-hidden border border-white/[0.08]">
         <ChatInterface
           messages={messages}
           onSend={handleSend}

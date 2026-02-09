@@ -25,14 +25,14 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
   return (
     <div className="flex flex-col h-full bg-black/40">
       {(title || subtitle) && (
-        <div className="px-6 py-4 border-b border-white/[0.03] backdrop-blur-sm">
+        <div className="px-6 py-4 border-b border-white/[0.06] backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center">
-              <Brain className="w-3.5 h-3.5 text-gold-light/40" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center">
+              <Brain className="w-3.5 h-3.5 text-amber-300/40" />
             </div>
             <div>
               {title && <h2 className="text-[13px] font-medium text-white/60">{title}</h2>}
-              {subtitle && <p className="text-[11px] text-white/15 font-light">{subtitle}</p>}
+              {subtitle && <p className="text-[11px] text-white/35 font-light">{subtitle}</p>}
             </div>
           </div>
         </div>
@@ -46,15 +46,15 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] sm:max-w-[70%] ${
                 msg.role === 'user'
-                  ? 'bg-gold/[0.06] border border-gold/[0.1] text-white/70'
-                  : 'bg-white/[0.015] border border-white/[0.03] text-white/40'
+                  ? 'bg-amber-500/[0.06] border border-amber-500/20 text-white/70'
+                  : 'bg-white/[0.015] border border-white/[0.06] text-white/40'
               } rounded-2xl px-4 py-3`}>
                 {msg.role === 'elit' && (
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="w-3.5 h-3.5 rounded-md bg-gold/[0.1] flex items-center justify-center">
-                      <Brain className="w-2 h-2 text-gold-light/40" />
+                    <div className="w-3.5 h-3.5 rounded-md bg-amber-500/[0.1] flex items-center justify-center">
+                      <Brain className="w-2 h-2 text-amber-300/40" />
                     </div>
-                    <span className="text-[9px] font-medium text-white/15 uppercase tracking-wider">Elit</span>
+                    <span className="text-[9px] font-medium text-white/35 uppercase tracking-wider">Elit</span>
                   </div>
                 )}
                 <p className="text-[13px] leading-relaxed whitespace-pre-wrap font-light">{msg.content}</p>
@@ -65,16 +65,16 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
 
         {isLoading && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="bg-white/[0.015] border border-white/[0.03] rounded-2xl px-4 py-3">
+            <div className="bg-white/[0.015] border border-white/[0.06] rounded-2xl px-4 py-3">
               <div className="flex items-center gap-1.5 mb-2">
-                <div className="w-3.5 h-3.5 rounded-md bg-gold/[0.1] flex items-center justify-center">
-                  <Brain className="w-2 h-2 text-gold-light/40" />
+                <div className="w-3.5 h-3.5 rounded-md bg-amber-500/[0.1] flex items-center justify-center">
+                  <Brain className="w-2 h-2 text-amber-300/40" />
                 </div>
-                <span className="text-[9px] font-medium text-white/15 uppercase tracking-wider">Thinking</span>
+                <span className="text-[9px] font-medium text-white/35 uppercase tracking-wider">Thinking</span>
               </div>
               <div className="flex gap-1.5">
                 {[0, 1, 2].map(i => (
-                  <motion.div key={i} className="w-1 h-1 rounded-full bg-gold/30"
+                  <motion.div key={i} className="w-1 h-1 rounded-full bg-amber-500/30"
                     animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1, 0.8] }}
                     transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }} />
                 ))}
@@ -85,7 +85,7 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="px-4 sm:px-6 py-4 border-t border-white/[0.03]">
+      <div className="px-4 sm:px-6 py-4 border-t border-white/[0.06]">
         <div className="flex gap-2 items-end">
           <textarea
             value={input}
@@ -96,11 +96,11 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
             className="elite-input flex-1 pr-10"
             style={{ maxHeight: '120px' }}
           />
-          <button className="p-2.5 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/15 hover:text-gold-light/40 hover:border-gold/[0.1] transition-all shrink-0 cursor-pointer" title="Voice">
+          <button className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/35 hover:text-amber-300/40 hover:border-amber-500/20 transition-all shrink-0 cursor-pointer" title="Voice">
             <Mic className="w-3.5 h-3.5" />
           </button>
           <button onClick={handleSubmit} disabled={!input.trim() || isLoading}
-            className="p-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/80 disabled:opacity-20 hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer">
+            className="p-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/80 disabled:opacity-20 hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer">
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>

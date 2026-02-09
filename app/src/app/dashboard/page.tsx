@@ -108,8 +108,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-8">
-            <Wallet className="w-7 h-7 text-gold-light/40" />
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mx-auto mb-8">
+            <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Dashboard</h1>
           <p className="text-white/20 mb-8 text-[13px] font-light">Connect your wallet to manage your Elit.</p>
@@ -128,11 +128,11 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Tabs */}
-        <motion.div variants={fadeUp} className="flex gap-0.5 p-1 rounded-xl bg-white/[0.015] border border-white/[0.03] mb-6 w-fit">
+        <motion.div variants={fadeUp} className="flex gap-0.5 p-1 rounded-xl bg-white/[0.015] border border-white/[0.06] mb-6 w-fit">
           {(['overview', 'actions', 'delegations'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-[11px] font-medium transition-all duration-300 capitalize cursor-pointer ${
-                tab === t ? 'bg-gold/[0.1] text-gold-light/70 border border-gold/[0.12]' : 'text-white/20 hover:text-white/35'
+                tab === t ? 'bg-amber-500/[0.1] text-amber-300/70 border border-amber-500/25' : 'text-white/20 hover:text-white/35'
               }`}
             >{t}</button>
           ))}
@@ -162,12 +162,12 @@ export default function DashboardPage() {
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-gold-light/50' },
-                      { label: 'Actions', value: actions.length.toString(), icon: Activity, color: 'text-gold-light/40' },
-                      { label: 'Delegations', value: delegations.filter(d => d.active).length.toString(), icon: Shield, color: 'text-gold-light/40' },
+                      { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-amber-300/50' },
+                      { label: 'Actions', value: actions.length.toString(), icon: Activity, color: 'text-amber-300/40' },
+                      { label: 'Delegations', value: delegations.filter(d => d.active).length.toString(), icon: Shield, color: 'text-amber-300/40' },
                       { label: 'Status', value: hash ? 'Verified' : 'Pending', icon: ShieldCheck, color: hash ? 'text-emerald-400/50' : 'text-amber-400/50' },
                     ].map(stat => (
-                      <div key={stat.label} className="rounded-xl bg-white/[0.015] border border-white/[0.03] p-4 hover:border-white/[0.05] transition-all duration-500">
+                      <div key={stat.label} className="rounded-xl bg-white/[0.015] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
                         <stat.icon className={`w-4 h-4 ${stat.color} mb-3`} />
                         <div className="text-lg font-bold text-white/80">{stat.value}</div>
                         <div className="text-[10px] text-white/15 uppercase tracking-wider">{stat.label}</div>
@@ -179,11 +179,11 @@ export default function DashboardPage() {
                 {hash && (
                   <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-3">
-                      <Brain className="w-3.5 h-3.5 text-gold-light/40" />
+                      <Brain className="w-3.5 h-3.5 text-amber-300/40" />
                       <h3 className="text-[13px] font-medium text-white/60">Personality Hash</h3>
                     </div>
-                    <div className="bg-white/[0.015] border border-white/[0.03] p-4 rounded-xl">
-                      <p className="font-mono text-[11px] text-gold-light/30 break-all">{hash}</p>
+                    <div className="bg-white/[0.015] border border-white/[0.06] p-4 rounded-xl">
+                      <p className="font-mono text-[11px] text-amber-300/30 break-all">{hash}</p>
                     </div>
                   </motion.div>
                 )}
@@ -197,8 +197,8 @@ export default function DashboardPage() {
                     { href: '/turing', icon: Eye, title: 'Turing Test', desc: 'Real vs AI' },
                   ].map(action => (
                     <Link key={action.href} href={action.href} className="group elite-card rounded-2xl p-5">
-                      <div className="w-9 h-9 rounded-xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mb-3 group-hover:bg-gold/[0.1] group-hover:border-gold/[0.15] group-hover:scale-105 transition-all duration-500">
-                        <action.icon className="w-3.5 h-3.5 text-gold-light/40" />
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mb-3 group-hover:bg-amber-500/[0.1] group-hover:border-amber-500/25 group-hover:scale-105 transition-all duration-500">
+                        <action.icon className="w-3.5 h-3.5 text-amber-300/40" />
                       </div>
                       <h3 className="font-medium text-white/70 text-[13px] mb-0.5 group-hover:text-white/90 transition-colors duration-500">{action.title}</h3>
                       <p className="text-[11px] text-white/15 font-light">{action.desc}</p>
@@ -210,17 +210,17 @@ export default function DashboardPage() {
                   <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <Activity className="w-3.5 h-3.5 text-gold-light/30" />
+                        <Activity className="w-3.5 h-3.5 text-amber-300/30" />
                         <h3 className="text-[13px] font-medium text-white/60">Recent Actions</h3>
                       </div>
-                      <button onClick={() => setTab('actions')} className="text-[11px] text-gold-light/30 hover:text-gold-light/50 transition-colors cursor-pointer">View all →</button>
+                      <button onClick={() => setTab('actions')} className="text-[11px] text-amber-300/30 hover:text-amber-300/50 transition-colors cursor-pointer">View all →</button>
                     </div>
                     <div className="space-y-2">
                       {actions.slice(0, 3).map(action => {
                         const Icon = ACTION_ICONS[action.type]
                         return (
-                          <div key={action.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                            <Icon className="w-3.5 h-3.5 text-gold-light/30 shrink-0" />
+                          <div key={action.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                            <Icon className="w-3.5 h-3.5 text-amber-300/30 shrink-0" />
                             <span className="text-[12px] text-white/30 flex-1 truncate font-light">{action.prompt}</span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                               action.status === 'completed' ? 'bg-emerald-400/[0.06] text-emerald-400/50' : 'bg-amber-400/[0.06] text-amber-400/50'
@@ -238,7 +238,7 @@ export default function DashboardPage() {
               <motion.div key="actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="elite-card rounded-2xl p-6">
                   <h3 className="text-[13px] font-medium text-white/60 mb-4 flex items-center gap-2">
-                    <Play className="w-3.5 h-3.5 text-gold-light/30" /> Execute Action
+                    <Play className="w-3.5 h-3.5 text-amber-300/30" /> Execute Action
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                     {(Object.keys(ACTION_LABELS) as ActionType[]).map(type => {
@@ -247,8 +247,8 @@ export default function DashboardPage() {
                         <button key={type} onClick={() => setActionType(type)}
                           className={`flex items-center gap-2 p-3 rounded-xl border text-[11px] font-medium transition-all duration-300 cursor-pointer ${
                             actionType === type
-                              ? 'border-gold/[0.15] bg-gold/[0.06] text-gold-light/60'
-                              : 'border-white/[0.03] bg-white/[0.01] text-white/20 hover:border-white/[0.06]'
+                              ? 'border-amber-500/25 bg-amber-500/[0.06] text-amber-300/60'
+                              : 'border-white/[0.06] bg-white/[0.01] text-white/20 hover:border-white/[0.06]'
                           }`}
                         >
                           <Icon className="w-3 h-3" /> {ACTION_LABELS[type]}
@@ -261,14 +261,14 @@ export default function DashboardPage() {
                       onKeyDown={e => e.key === 'Enter' && executeAction()}
                       placeholder="What should your Elit do?" className="elite-input flex-1" />
                     <button onClick={executeAction} disabled={isExecuting || !actionPrompt.trim()}
-                      className="px-5 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
+                      className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
                       {isExecuting ? <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
                 <div className="elite-card rounded-2xl p-5">
                   <h3 className="text-[13px] font-medium text-white/60 mb-4 flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-gold-light/30" /> Action History
+                    <Clock className="w-3.5 h-3.5 text-amber-300/30" /> Action History
                   </h3>
                   {actions.length === 0 ? (
                     <p className="text-center text-white/15 text-[13px] py-8 font-light">No actions yet.</p>
@@ -277,9 +277,9 @@ export default function DashboardPage() {
                       {actions.map(action => {
                         const Icon = ACTION_ICONS[action.type]
                         return (
-                          <motion.div key={action.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.015] border border-white/[0.03] p-4">
+                          <motion.div key={action.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.015] border border-white/[0.06] p-4">
                             <div className="flex items-center gap-3 mb-3">
-                              <Icon className="w-3.5 h-3.5 text-gold-light/30" />
+                              <Icon className="w-3.5 h-3.5 text-amber-300/30" />
                               <div className="flex-1 min-w-0">
                                 <span className="text-[11px] font-medium text-white/50">{ACTION_LABELS[action.type]}</span>
                                 <p className="text-[11px] text-white/15 truncate font-light">{action.prompt}</p>
@@ -306,7 +306,7 @@ export default function DashboardPage() {
             {tab === 'delegations' && (
               <motion.div key="delegations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <button onClick={() => setShowNewDelegation(!showNewDelegation)}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold/[0.06] text-gold-light/50 border border-gold/[0.1] text-[11px] font-medium hover:bg-gold/[0.1] transition-all cursor-pointer">
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/[0.06] text-amber-300/50 border border-amber-500/20 text-[11px] font-medium hover:bg-amber-500/[0.1] transition-all cursor-pointer">
                   <Plus className="w-3 h-3" /> New Delegation
                 </button>
 
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                             {['chat', 'post', 'code', 'research', 'full'].map(scope => (
                               <button key={scope} onClick={() => setNewScopes(prev => prev.includes(scope) ? prev.filter(s => s !== scope) : [...prev, scope])}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all capitalize cursor-pointer ${
-                                  newScopes.includes(scope) ? 'border-gold/[0.2] bg-gold/[0.08] text-gold-light/60' : 'border-white/[0.04] bg-white/[0.015] text-white/20 hover:border-white/[0.08]'
+                                  newScopes.includes(scope) ? 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300/60' : 'border-white/[0.08] bg-white/[0.015] text-white/20 hover:border-white/[0.08]'
                                 }`}>{scope}</button>
                             ))}
                           </div>
@@ -337,7 +337,7 @@ export default function DashboardPage() {
                           <input value={newRestrictions} onChange={e => setNewRestrictions(e.target.value)} placeholder="e.g. No controversial topics" className="elite-input w-full" />
                         </div>
                         <button onClick={createDelegation} disabled={newScopes.length === 0}
-                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[12px] hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[12px] hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
                           Create Delegation
                         </button>
                       </div>
@@ -347,17 +347,17 @@ export default function DashboardPage() {
 
                 <div className="elite-card rounded-2xl p-5">
                   <h3 className="text-[13px] font-medium text-white/60 mb-4 flex items-center gap-2">
-                    <Shield className="w-3.5 h-3.5 text-gold-light/30" /> Active Delegations
+                    <Shield className="w-3.5 h-3.5 text-amber-300/30" /> Active Delegations
                   </h3>
                   <div className="space-y-3">
                     {delegations.map(del => (
                       <motion.div key={del.id} layout className={`rounded-xl border p-4 transition-all duration-500 ${
-                        del.active ? 'bg-white/[0.015] border-white/[0.03]' : 'bg-red-500/[0.01] border-red-500/[0.06] opacity-50'
+                        del.active ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-red-500/[0.01] border-red-500/[0.06] opacity-50'
                       }`}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex flex-wrap gap-1">
                             {del.scopes.map(scope => (
-                              <span key={scope} className="px-2 py-0.5 rounded-md bg-gold/[0.06] text-gold-light/40 text-[10px] border border-gold/[0.08] font-medium capitalize">{scope}</span>
+                              <span key={scope} className="px-2 py-0.5 rounded-md bg-amber-500/[0.06] text-amber-300/40 text-[10px] border border-amber-500/15 font-medium capitalize">{scope}</span>
                             ))}
                           </div>
                           {del.active ? (
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                         Confirm — Revoke Everything
                       </button>
                       <button onClick={() => setKillSwitchConfirm(false)}
-                        className="px-4 py-2.5 rounded-xl border border-white/[0.04] text-white/20 text-[12px] hover:text-white/40 transition-colors cursor-pointer">
+                        className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-white/20 text-[12px] hover:text-white/40 transition-colors cursor-pointer">
                         Cancel
                       </button>
                     </div>
@@ -406,12 +406,12 @@ export default function DashboardPage() {
           </AnimatePresence>
         ) : (
           <motion.div variants={fadeUp} className="elite-card rounded-2xl p-14 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-6">
-              <Brain className="w-7 h-7 text-gold-light/30" />
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mx-auto mb-6">
+              <Brain className="w-7 h-7 text-amber-300/30" />
             </div>
             <h2 className="text-xl font-bold gradient-text-white mb-3">No Elit Yet</h2>
             <p className="text-white/15 mb-8 text-[13px] font-light">Create your AI clone to get started.</p>
-            <Link href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
+            <Link href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
               Create Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
             </Link>
           </motion.div>

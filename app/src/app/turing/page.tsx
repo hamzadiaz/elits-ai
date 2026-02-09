@@ -77,9 +77,9 @@ export default function TuringTestPage() {
             <motion.div key="intro" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} className="text-center">
               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', bounce: 0.4 }}
                 className="relative w-20 h-20 mx-auto mb-8">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold/[0.08] to-gold-dark/[0.08] animate-pulse-glow" />
-                <div className="absolute inset-0 rounded-full bg-white/[0.015] border border-white/[0.04] flex items-center justify-center backdrop-blur-sm">
-                  <Eye className="w-8 h-8 text-gold-light/40" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-500/[0.08] to-amber-600/[0.08] animate-pulse-glow" />
+                <div className="absolute inset-0 rounded-full bg-white/[0.015] border border-white/[0.08] flex items-center justify-center backdrop-blur-sm">
+                  <Eye className="w-8 h-8 text-amber-300/40" />
                 </div>
               </motion.div>
 
@@ -93,7 +93,7 @@ export default function TuringTestPage() {
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <button onClick={startTest} disabled={!systemPrompt}
-                  className="group flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
+                  className="group flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all disabled:opacity-30 cursor-pointer">
                   <Sparkles className="w-3.5 h-3.5 opacity-60" /> Start the Test
                   <ChevronRight className="w-3.5 h-3.5 opacity-40 group-hover:translate-x-0.5 transition-all" />
                 </button>
@@ -107,7 +107,7 @@ export default function TuringTestPage() {
                   { icon: Trophy, label: 'Score %' },
                 ].map((item, i) => (
                   <motion.div key={item.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.08 }}
-                    className="text-center p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
+                    className="text-center p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
                     <item.icon className="w-4 h-4 text-white/10 mx-auto mb-1.5" />
                     <span className="text-[10px] text-white/15">{item.label}</span>
                   </motion.div>
@@ -123,7 +123,7 @@ export default function TuringTestPage() {
                 <div className="flex gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className={`w-8 h-1 rounded-full transition-all duration-500 ${
-                      i < round ? 'bg-gold/40' : i === round ? 'bg-gold/20' : 'bg-white/[0.03]'
+                      i < round ? 'bg-amber-500/40' : i === round ? 'bg-amber-500/20' : 'bg-white/[0.03]'
                     }`} />
                   ))}
                 </div>
@@ -132,7 +132,7 @@ export default function TuringTestPage() {
               <motion.div key={`q-${round}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="elite-card rounded-2xl p-5 mb-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <User className="w-3.5 h-3.5 text-gold-light/30" />
+                  <User className="w-3.5 h-3.5 text-amber-300/30" />
                   <span className="text-[10px] text-white/15 font-medium uppercase tracking-wider">Question</span>
                 </div>
                 <p className="text-white/60 text-[14px] font-light">{currentQuestion}</p>
@@ -142,7 +142,7 @@ export default function TuringTestPage() {
                 <div className="flex items-center justify-center py-20">
                   <div className="flex items-center gap-3">
                     {[0, 1, 2].map(i => (
-                      <motion.div key={i} className="w-1.5 h-1.5 bg-gold/30 rounded-full"
+                      <motion.div key={i} className="w-1.5 h-1.5 bg-amber-500/30 rounded-full"
                         animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1, 0.8] }}
                         transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }} />
                     ))}
@@ -159,18 +159,18 @@ export default function TuringTestPage() {
                       <motion.button key={label} whileHover={{ scale: selectedGuess ? 1 : 1.005 }}
                         onClick={() => !selectedGuess && makeGuess(label as 'A' | 'B')} disabled={!!selectedGuess}
                         className={`w-full text-left rounded-2xl p-5 border transition-all duration-500 cursor-pointer ${
-                          isSelected ? 'border-gold/[0.2] bg-gold/[0.03] shadow-[0_0_40px_rgba(212,160,23,0.04)]'
+                          isSelected ? 'border-amber-500/30 bg-amber-500/[0.03] shadow-[0_0_40px_rgba(212,160,23,0.04)]'
                             : selectedGuess ? 'border-white/[0.02] bg-white/[0.005] opacity-40'
-                              : 'border-white/[0.04] bg-white/[0.015] hover:border-white/[0.08] hover:bg-white/[0.02]'
+                              : 'border-white/[0.08] bg-white/[0.015] hover:border-white/[0.08] hover:bg-white/[0.02]'
                         }`}>
                         <div className="flex items-center gap-2 mb-3">
                           <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-semibold ${
-                            isSelected ? 'bg-gold/[0.12] text-gold-light/60' : 'bg-white/[0.03] text-white/20'
+                            isSelected ? 'bg-amber-500/[0.12] text-amber-300/60' : 'bg-white/[0.03] text-white/20'
                           }`}>{label}</div>
                           <span className="text-[10px] text-white/15">Response {label}</span>
                           {isSelected && (
                             <motion.span initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
-                              className="ml-auto text-[10px] text-gold-light/40 font-medium">Selected ✓</motion.span>
+                              className="ml-auto text-[10px] text-amber-300/40 font-medium">Selected ✓</motion.span>
                           )}
                         </div>
                         <p className="text-[13px] text-white/30 leading-relaxed font-light">{content}</p>
@@ -214,11 +214,11 @@ export default function TuringTestPage() {
 
               <div className="flex gap-3 justify-center">
                 <button onClick={startTest}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all cursor-pointer">
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all cursor-pointer">
                   <RotateCcw className="w-3.5 h-3.5 opacity-60" /> Try Again
                 </button>
                 <a href="/chat/default"
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/30 hover:text-white/50 text-[13px] transition-all">
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/30 hover:text-white/50 text-[13px] transition-all">
                   <MessageSquare className="w-3.5 h-3.5" /> Chat with Elit
                 </a>
               </div>

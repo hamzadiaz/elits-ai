@@ -82,8 +82,8 @@ export default function VerifyElitPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-2.5">
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                  <User className="w-3.5 h-3.5 text-gold-light/30 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <User className="w-3.5 h-3.5 text-amber-300/30 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-white/15 mb-1 uppercase tracking-wider">Owner Wallet</p>
                     <div className="flex items-center gap-2">
@@ -95,12 +95,12 @@ export default function VerifyElitPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                  <Fingerprint className="w-3.5 h-3.5 text-gold-light/30 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <Fingerprint className="w-3.5 h-3.5 text-amber-300/30 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-white/15 mb-1 uppercase tracking-wider">Personality Hash</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-mono text-[10px] text-gold-light/30 break-all flex-1">{hash || 'Not yet generated'}</p>
+                      <p className="font-mono text-[10px] text-amber-300/30 break-all flex-1">{hash || 'Not yet generated'}</p>
                       {hash && (
                         <button onClick={copyHash} className="shrink-0 p-1 hover:text-white/40 text-white/15 transition-colors cursor-pointer">
                           {copied ? <Check className="w-3 h-3 text-emerald-400/50" /> : <Copy className="w-3 h-3" />}
@@ -111,14 +111,14 @@ export default function VerifyElitPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                    <Calendar className="w-3.5 h-3.5 text-gold-light/25 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                    <Calendar className="w-3.5 h-3.5 text-amber-300/25 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-[10px] text-white/15 mb-0.5 uppercase tracking-wider">Created</p>
                       <p className="text-[11px] text-white/30 font-light">{creationDate}</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
                     <Clock className="w-3.5 h-3.5 text-emerald-400/30 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-[10px] text-white/15 mb-0.5 uppercase tracking-wider">Last Active</p>
@@ -127,16 +127,16 @@ export default function VerifyElitPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                  <Globe className="w-3.5 h-3.5 text-gold-light/25 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <Globe className="w-3.5 h-3.5 text-amber-300/25 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-[10px] text-white/15 mb-1 uppercase tracking-wider">Network</p>
                     <p className="text-[12px] text-white/30 font-light">Solana Devnet</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                  <Key className="w-3.5 h-3.5 text-gold-light/25 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <Key className="w-3.5 h-3.5 text-amber-300/25 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-[10px] text-white/15 mb-1.5 uppercase tracking-wider">Delegation Scopes</p>
                     <div className="flex flex-wrap gap-1">
@@ -162,7 +162,7 @@ export default function VerifyElitPage() {
 
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="elite-card rounded-2xl p-5">
               <p className="text-[10px] text-white/15 uppercase tracking-wider mb-3 font-medium">Embeddable Badge</p>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-black/30 border border-white/[0.03]">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-black/30 border border-white/[0.06]">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-400/[0.04] border border-emerald-400/[0.1]">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/50" />
                   <span className="text-[11px] text-emerald-400/50 font-medium">Verified Elit</span>
@@ -174,11 +174,11 @@ export default function VerifyElitPage() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="flex gap-3">
-              <a href="/chat/default" className="flex-1 group flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
+              <a href="/chat/default" className="flex-1 group flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all">
                 <MessageSquare className="w-3.5 h-3.5 opacity-60" /> Talk to this Elit
               </a>
               <a href="https://explorer.solana.com/?cluster=devnet" target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/25 hover:text-white/45 transition-all text-[13px]">
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/25 hover:text-white/45 transition-all text-[13px]">
                 <ExternalLink className="w-3.5 h-3.5" /> Explorer
               </a>
             </motion.div>
@@ -186,7 +186,7 @@ export default function VerifyElitPage() {
         ) : (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="elite-card rounded-2xl p-10 text-center">
             <p className="text-white/20 mb-4 text-[13px] font-light">No Elit found. Create one first.</p>
-            <a href="/create" className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gold/[0.08] text-gold-light/50 text-[12px] border border-gold/[0.1] hover:bg-gold/[0.12] transition-all">
+            <a href="/create" className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-amber-500/[0.08] text-amber-300/50 text-[12px] border border-amber-500/20 hover:bg-amber-500/[0.12] transition-all">
               Create Elit →
             </a>
           </motion.div>

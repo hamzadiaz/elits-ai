@@ -47,8 +47,8 @@ function TagSelector({ options, selected, onToggle, label }: {
             onClick={() => onToggle(opt)}
             className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-300 cursor-pointer ${
               selected.includes(opt)
-                ? 'bg-gold/[0.12] text-gold-light/80 border border-gold/[0.2] shadow-[0_0_15px_rgba(212,160,23,0.05)]'
-                : 'bg-white/[0.02] border border-white/[0.04] text-white/25 hover:text-white/40 hover:border-white/[0.08]'
+                ? 'bg-amber-500/[0.12] text-amber-300/80 border border-amber-500/30 shadow-[0_0_15px_rgba(212,160,23,0.05)]'
+                : 'bg-white/[0.02] border border-white/[0.08] text-white/25 hover:text-white/40 hover:border-white/[0.08]'
             }`}
           >
             {selected.includes(opt) && <Check className="w-2.5 h-2.5 inline mr-1" />}
@@ -140,8 +140,8 @@ export default function CreateElitPage() {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-8">
-            <Wallet className="w-7 h-7 text-gold-light/40" />
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mx-auto mb-8">
+            <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Connect Your Wallet</h1>
           <p className="text-white/20 mb-8 text-[13px] font-light leading-relaxed">
@@ -191,23 +191,23 @@ export default function CreateElitPage() {
               <div className="relative">
                 <Avatar3D avatarUrl={avatarPreview} name={profile.name || '?'} size="lg" state={generatingAvatar ? 'thinking' : 'idle'} />
                 {generatingAvatar && (
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/[0.1] border border-gold/[0.15]">
-                    <Loader2 className="w-2.5 h-2.5 text-gold-light/60 animate-spin" />
-                    <span className="text-[10px] text-gold-light/50">Generating...</span>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/[0.1] border border-amber-500/25">
+                    <Loader2 className="w-2.5 h-2.5 text-amber-300/60 animate-spin" />
+                    <span className="text-[10px] text-amber-300/50">Generating...</span>
                   </div>
                 )}
               </div>
               <div>
                 <p className="text-[13px] text-white/25 mb-2">{generatingAvatar ? 'Creating avatar...' : 'Your AI Avatar'}</p>
-                <button onClick={() => fileInputRef.current?.click()} className="text-[11px] text-gold-light/40 hover:text-gold-light/60 transition-colors cursor-pointer">Change photo</button>
+                <button onClick={() => fileInputRef.current?.click()} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer">Change photo</button>
               </div>
             </div>
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border border-dashed border-white/[0.04] rounded-2xl p-8 text-center hover:border-gold/[0.12] transition-all duration-500 cursor-pointer group"
+              className="border border-dashed border-white/[0.08] rounded-2xl p-8 text-center hover:border-amber-500/25 transition-all duration-500 cursor-pointer group"
             >
-              <Upload className="w-7 h-7 text-white/10 mx-auto mb-3 group-hover:text-gold/30 transition-colors duration-500" />
+              <Upload className="w-7 h-7 text-white/10 mx-auto mb-3 group-hover:text-amber-400/30 transition-colors duration-500" />
               <p className="text-[13px] text-white/20 font-light">Upload a photo to generate your 3D avatar</p>
               <p className="text-[11px] text-white/10 mt-1">PNG, JPG up to 5MB</p>
             </div>
@@ -249,7 +249,7 @@ export default function CreateElitPage() {
                       onClick={() => setProfile(p => ({ ...p, communicationStyle: { ...p.communicationStyle, [field]: opt } }))}
                       className={`w-full px-3 py-2 rounded-lg text-[12px] text-left transition-all duration-300 cursor-pointer ${
                         profile.communicationStyle[field] === opt
-                          ? 'bg-gold/[0.1] text-gold-light/70 border border-gold/[0.15]'
+                          ? 'bg-amber-500/[0.1] text-amber-300/70 border border-amber-500/25'
                           : 'bg-white/[0.01] text-white/25 hover:bg-white/[0.03] border border-transparent'
                       }`}
                     >
@@ -306,13 +306,13 @@ export default function CreateElitPage() {
       <p className="text-white/20 mb-6 text-[13px] font-light">Your personality hash has been generated. Train your Elit to make it truly you.</p>
       <div className="elite-card rounded-xl p-4 mb-8 max-w-md mx-auto">
         <p className="text-[10px] text-white/15 uppercase tracking-wider mb-1.5">Personality Hash (SHA-256)</p>
-        <p className="text-gold-light/50 font-mono text-[11px] break-all">{hash}</p>
+        <p className="text-amber-300/50 font-mono text-[11px] break-all">{hash}</p>
       </div>
       <div className="flex gap-3 justify-center">
-        <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
+        <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
           Train Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
         </button>
-        <button onClick={() => router.push('/dashboard')} className="px-7 py-3 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/30 font-medium text-[13px] hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer">
+        <button onClick={() => router.push('/dashboard')} className="px-7 py-3 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/30 font-medium text-[13px] hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer">
           Dashboard
         </button>
       </div>
@@ -328,15 +328,15 @@ export default function CreateElitPage() {
               <div key={i} className="flex items-center gap-3 flex-1">
                 <div className={`flex items-center gap-2 transition-all duration-500 ${i <= step ? 'opacity-100' : 'opacity-20'}`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-500 ${
-                    i < step ? 'bg-gold/[0.1] border border-gold/[0.15]'
-                      : i === step ? 'bg-gradient-to-br from-gold-dark to-gold shadow-[0_0_25px_rgba(212,160,23,0.1)]'
-                        : 'bg-white/[0.02] border border-white/[0.04]'
+                    i < step ? 'bg-amber-500/[0.1] border border-amber-500/25'
+                      : i === step ? 'bg-gradient-to-br from-amber-600 to-amber-500 shadow-[0_0_25px_rgba(212,160,23,0.1)]'
+                        : 'bg-white/[0.02] border border-white/[0.08]'
                   }`}>
-                    {i < step ? <Check className="w-3 h-3 text-gold-light/60" /> : <s.icon className="w-3 h-3 text-white/50" />}
+                    {i < step ? <Check className="w-3 h-3 text-amber-300/60" /> : <s.icon className="w-3 h-3 text-white/50" />}
                   </div>
                   <span className="text-[11px] text-white/20 hidden sm:block">{s.label}</span>
                 </div>
-                {i < 3 && <div className={`flex-1 h-px transition-all duration-500 ${i < step ? 'bg-gold/[0.2]' : 'bg-white/[0.03]'}`} />}
+                {i < 3 && <div className={`flex-1 h-px transition-all duration-500 ${i < step ? 'bg-amber-500/[0.2]' : 'bg-white/[0.03]'}`} />}
               </div>
             ))}
           </div>
@@ -348,7 +348,7 @@ export default function CreateElitPage() {
           <div className="flex justify-between mt-10">
             <button
               onClick={() => setStep(s => Math.max(0, s - 1))}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/[0.04] bg-white/[0.015] text-white/25 hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer ${step === 0 ? 'invisible' : ''}`}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/25 hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer ${step === 0 ? 'invisible' : ''}`}
             >
               <ChevronLeft className="w-3.5 h-3.5" /> Back
             </button>
@@ -356,7 +356,7 @@ export default function CreateElitPage() {
               <button
                 onClick={() => setStep(s => s + 1)}
                 disabled={step === 0 && !profile.name}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] disabled:opacity-20 hover:scale-[1.02] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] disabled:opacity-20 hover:scale-[1.02] transition-all cursor-pointer"
               >
                 Continue <ChevronRight className="w-3.5 h-3.5 opacity-50" />
               </button>
@@ -364,7 +364,7 @@ export default function CreateElitPage() {
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="group inline-flex items-center gap-2 px-8 py-2.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.02] transition-all disabled:opacity-40 cursor-pointer"
+                className="group inline-flex items-center gap-2 px-8 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.02] transition-all disabled:opacity-40 cursor-pointer"
               >
                 {creating ? (
                   <><div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" /> Creating...</>

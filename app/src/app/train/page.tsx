@@ -116,8 +116,8 @@ export default function TrainPage() {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-8">
-            <Wallet className="w-7 h-7 text-gold-light/40" />
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mx-auto mb-8">
+            <Wallet className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Connect to Train</h1>
           <p className="text-white/20 mb-8 text-[13px] font-light">Connect your wallet and create an Elit first.</p>
@@ -131,12 +131,12 @@ export default function TrainPage() {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gold/[0.06] border border-gold/[0.08] flex items-center justify-center mx-auto mb-8">
-            <Brain className="w-7 h-7 text-gold-light/40" />
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mx-auto mb-8">
+            <Brain className="w-7 h-7 text-amber-300/40" />
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">Create Your Elit First</h1>
           <p className="text-white/20 mb-8 text-[13px] font-light">You need to create an Elit before training.</p>
-          <a href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all">
+          <a href="/create" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] hover:scale-[1.02] transition-all">
             Create Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
           </a>
         </motion.div>
@@ -149,7 +149,7 @@ export default function TrainPage() {
   return (
     <div className="h-[calc(100vh-4rem)] flex max-w-7xl mx-auto">
       {/* Sidebar */}
-      <div className="hidden lg:flex w-72 flex-col border-r border-white/[0.03] p-6">
+      <div className="hidden lg:flex w-72 flex-col border-r border-white/[0.06] p-6">
         <div className="flex items-center gap-3 mb-8">
           <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="sm" />
           <div>
@@ -168,7 +168,7 @@ export default function TrainPage() {
             ].map(m => (
               <button key={m.mode} onClick={() => setMode(m.mode)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[12px] transition-all duration-300 cursor-pointer ${
-                  mode === m.mode ? 'bg-gold/[0.1] text-gold-light/60 border border-gold/[0.15]' : 'bg-white/[0.015] text-white/20 border border-white/[0.03] hover:border-white/[0.06]'
+                  mode === m.mode ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.015] text-white/20 border border-white/[0.06] hover:border-white/[0.06]'
                 }`}>
                 <m.icon className="w-3.5 h-3.5" /> {m.label}
               </button>
@@ -180,9 +180,9 @@ export default function TrainPage() {
           <p className="text-[10px] text-white/15 uppercase tracking-wider font-medium">Progress</p>
           <div className="elite-card rounded-xl p-4 space-y-3">
             {[
-              { icon: MessageSquare, label: 'Messages', value: profile.trainingMessages.length + messages.length, color: 'text-gold-light/40' },
-              { icon: Target, label: 'Sessions', value: profile.trainingSessions.length + 1, color: 'text-gold-light/35' },
-              { icon: Zap, label: 'Knowledge', value: profile.knowledgeGraph?.length || 0, color: 'text-gold-light/30' },
+              { icon: MessageSquare, label: 'Messages', value: profile.trainingMessages.length + messages.length, color: 'text-amber-300/40' },
+              { icon: Target, label: 'Sessions', value: profile.trainingSessions.length + 1, color: 'text-amber-300/35' },
+              { icon: Zap, label: 'Knowledge', value: profile.knowledgeGraph?.length || 0, color: 'text-amber-300/30' },
             ].map(s => (
               <div key={s.label} className="flex items-center gap-3">
                 <s.icon className={`w-3.5 h-3.5 ${s.color}`} />
@@ -199,7 +199,7 @@ export default function TrainPage() {
                 <span>{Math.min(100, Math.round(userMsgCount / 6 * 100))}%</span>
               </div>
               <div className="h-1 bg-white/[0.03] rounded-full overflow-hidden">
-                <motion.div className="h-full bg-gradient-to-r from-gold-dark to-gold rounded-full"
+                <motion.div className="h-full bg-gradient-to-r from-amber-600 to-amber-500 rounded-full"
                   initial={{ width: 0 }} animate={{ width: `${Math.min(100, Math.round(userMsgCount / 6 * 100))}%` }}
                   transition={{ duration: 0.6 }} />
               </div>
@@ -235,7 +235,7 @@ export default function TrainPage() {
             {trainingComplete && !hash && (
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="px-4 pb-4">
                 <button onClick={handleFinalize} disabled={isLoading}
-                  className="w-full group flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-gold-dark to-gold text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.01] transition-all disabled:opacity-40 cursor-pointer">
+                  className="w-full group flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-semibold text-[13px] btn-glow hover:scale-[1.01] transition-all disabled:opacity-40 cursor-pointer">
                   <Sparkles className="w-4 h-4 opacity-60" /> Finalize Training & Generate Hash
                 </button>
               </motion.div>
