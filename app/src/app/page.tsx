@@ -100,8 +100,8 @@ const features = [
   { icon: Brain, title: '3D AI Avatar', description: 'Upload a photo — AI generates a stylized 3D avatar with idle, speaking, and thinking animations. Your visual identity, on-chain.' },
   { icon: Zap, title: 'Actions & Delegation', description: 'Your Elit posts tweets, writes code, responds to messages — with scoped, time-limited delegations you fully control.' },
   { icon: Shield, title: 'On-Chain Verification', description: 'Personality hash stored on Solana. Anyone can verify your Elit is authorized. One transaction to revoke everything.' },
-  { icon: Fingerprint, title: 'Turing Test', description: 'Blind comparison between you and your Elit. Can people tell the difference? Prove how authentic your Elit agent is.' },
-  { icon: Lock, title: 'Emergency Kill Switch', description: 'Full control over your agent. Revoke all delegations and disable actions instantly. Your agent, your rules.' },
+  { icon: Fingerprint, title: 'Agent Leveling & XP', description: 'Your Elit levels up as you train it. Track capabilities across knowledge, communication, actions, trust, and creativity.' },
+  { icon: Lock, title: 'Agent Marketplace', description: 'Browse verified agents, use templates, or fork existing Elits. A living economy of AI agents on Solana.' },
 ]
 
 const steps = [
@@ -261,6 +261,44 @@ export default function LandingPage() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ──── MARKETPLACE TEASER ──── */}
+      <section className="py-32 px-4 border-t border-amber-500/8">
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-[11px] font-medium text-amber-400/50 uppercase tracking-[0.2em] mb-4">Ecosystem</p>
+            <h2 className="text-3xl sm:text-5xl font-bold gradient-text-white mb-5 tracking-tight">Agent Marketplace</h2>
+            <p className="text-white/50 text-base max-w-lg mx-auto font-light leading-relaxed">
+              Browse verified agents, use templates, or fork existing Elits. A living economy of AI agents — each one unique, each one on-chain.
+            </p>
+          </Reveal>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+            {[
+              { value: '2,847+', label: 'Active Agents' },
+              { value: '12.3K', label: 'Daily Actions' },
+              { value: '48K+', label: 'Templates Used' },
+              { value: '$0', label: 'To Get Started' },
+            ].map((stat, i) => (
+              <Reveal key={stat.label} delay={i * 0.06}>
+                <div className="text-center p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <div className="text-lg font-bold gradient-text mb-1">{stat.value}</div>
+                  <div className="text-[10px] text-white/30 uppercase tracking-wider">{stat.label}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.2} className="text-center">
+            <Link href="/explore"
+              className="beam-btn group inline-flex items-center gap-2 px-8 py-3.5 bg-white/[0.04] text-white/60 font-medium text-sm hover:bg-white/[0.06] hover:text-white/80 transition-all duration-300">
+              <Globe className="w-3.5 h-3.5 opacity-60" />
+              Explore Marketplace
+              <ArrowRight className="w-3.5 h-3.5 opacity-40 group-hover:translate-x-0.5 group-hover:opacity-70 transition-all" />
+            </Link>
+          </Reveal>
         </div>
       </section>
 

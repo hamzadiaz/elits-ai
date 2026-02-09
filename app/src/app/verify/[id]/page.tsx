@@ -7,8 +7,12 @@ import { Avatar3D } from '@/components/Avatar3D'
 import { getConnection, getProvider, getProgram, fetchElitAccount, findElitPDA, explorerAccountUrl, PublicKey } from '@/lib/solana'
 import {
   ShieldCheck, ExternalLink, Copy, Check, Globe, Fingerprint, Key,
-  MessageSquare, Calendar, TrendingUp, Clock, Zap, User, Loader2, AlertTriangle
+  MessageSquare, Calendar, TrendingUp, Clock, Zap, User, Loader2, AlertTriangle, Brain
 } from 'lucide-react'
+import { XPBar } from '@/components/XPBar'
+import { LevelBadge } from '@/components/LevelBadge'
+import { CapabilityChart } from '@/components/CapabilityChart'
+import { calculateXP, calculateCapabilities } from '@/lib/xp'
 
 interface ElitData {
   name: string
@@ -27,7 +31,7 @@ export default function VerifyElitPage() {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [copiedWallet, setCopiedWallet] = useState(false)
-  const [localProfile, setLocalProfile] = useState<{ name: string; bio: string; skills: string[]; avatarUrl?: string | null } | null>(null)
+  const [localProfile, setLocalProfile] = useState<{ name: string; bio: string; skills: string[]; avatarUrl?: string | null; trainingMessages?: unknown[]; trainingSessions?: unknown[]; knowledgeGraph?: unknown[]; values?: string[] } | null>(null)
 
   const loadFromChain = useCallback(async () => {
     if (!publicKey) { setLoading(false); return }
@@ -129,9 +133,19 @@ export default function VerifyElitPage() {
           <div className="space-y-3">
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="elite-card rounded-2xl p-6">
               <div className="flex items-center gap-4 mb-5">
-                <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
+                <div className="relative">
+                  <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
+                  {localProfile && (
+                    <div className="absolute -bottom-1 -right-1">
+                      <LevelBadge xp={calculateXP(localProfile as Parameters<typeof calculateXP>[0])} size="sm" />
+                    </div>
+                  )}
+                </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white/80">{profile.name}&apos;s Elit</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold text-white/80">{profile.name}&apos;s Elit</h2>
+                    {localProfile && <LevelBadge xp={calculateXP(localProfile as Parameters<typeof calculateXP>[0])} size="sm" showTier />}
+                  </div>
                   <p className="text-[12px] text-white/40 line-clamp-1 font-light">{profile.bio?.slice(0, 80)}</p>
                 </div>
               </div>
@@ -206,6 +220,26 @@ export default function VerifyElitPage() {
                 </div>
               </div>
             </motion.div>
+
+            {/* XP & Level */}
+            {localProfile && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="elite-card rounded-2xl p-5">
+                <XPBar xp={calculateXP(localProfile as Parameters<typeof calculateXP>[0])} />
+              </motion.div>
+            )}
+
+            {/* Capabilities */}
+            {localProfile && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }} className="elite-card rounded-2xl p-5">
+                <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3 font-medium flex items-center gap-1.5">
+                  <Brain className="w-3 h-3" /> Agent Capabilities
+                </p>
+                <CapabilityChart
+                  capabilities={calculateCapabilities(localProfile as Parameters<typeof calculateCapabilities>[0])}
+                  size={160}
+                />
+              </motion.div>
+            )}
 
             {profile.skills?.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="elite-card rounded-2xl p-5">

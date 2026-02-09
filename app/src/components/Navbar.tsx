@@ -14,6 +14,7 @@ const WalletMultiButton = dynamic(
 
 const links = [
   { href: '/', label: 'Home' },
+  { href: '/explore', label: 'Explore' },
   { href: '/create', label: 'Create' },
   { href: '/train', label: 'Train' },
   { href: '/dashboard', label: 'Dashboard' },

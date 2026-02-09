@@ -81,7 +81,20 @@ export default function CreateElitPage() {
   const { connected, publicKey, signTransaction, signAllTransactions } = useWallet()
   const router = useRouter()
   const [step, setStep] = useState(0)
-  const [profile, setProfile] = useState<PersonalityProfile>(createEmptyProfile())
+  const [profile, setProfile] = useState<PersonalityProfile>(() => {
+    // Check for template pre-fill from Explore page
+    if (typeof window !== 'undefined') {
+      const template = localStorage.getItem('elitTemplate')
+      if (template) {
+        localStorage.removeItem('elitTemplate') // Clear after use
+        try {
+          const parsed = JSON.parse(template)
+          return { ...createEmptyProfile(), ...parsed, name: '' } // Keep name empty for user to fill
+        } catch { /* fall through */ }
+      }
+    }
+    return createEmptyProfile()
+  })
   const [creating, setCreating] = useState(false)
   const [hash, setHash] = useState('')
   const [txSignature, setTxSignature] = useState('')

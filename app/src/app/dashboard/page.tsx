@@ -11,8 +11,12 @@ import { getConnection, getProvider, getProgram, delegateOnChain, revokeElitOnCh
 import {
   Wallet, Zap, MessageSquare, ShieldCheck, Mic, Brain, ChevronRight,
   Activity, Clock, Twitter, Code, Mail, Search,
-  Play, CheckCircle, XCircle, Shield, Plus, Eye, Power, ExternalLink, Loader2
+  Play, CheckCircle, XCircle, Shield, Plus, Eye, Power, ExternalLink, Loader2, Trophy
 } from 'lucide-react'
+import { XPBar } from '@/components/XPBar'
+import { LevelBadge } from '@/components/LevelBadge'
+import { CapabilityChart } from '@/components/CapabilityChart'
+import { calculateXP, calculateCapabilities, getUnlockedMilestones, type AgentStats } from '@/lib/xp'
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -62,6 +66,10 @@ export default function DashboardPage() {
   const [lastTxSig, setLastTxSig] = useState('')
   const [txError, setTxError] = useState('')
 
+  const [agentXP, setAgentXP] = useState(0)
+  const [capabilities, setCapabilities] = useState<AgentStats['capabilities']>({ knowledge: 0, communication: 0, actions: 0, trust: 0, creativity: 0 })
+  const [milestones, setMilestones] = useState<ReturnType<typeof getUnlockedMilestones>>([])
+
   useEffect(() => {
     const stored = localStorage.getItem('elitProfile')
     const storedHash = localStorage.getItem('elitHash')
@@ -70,6 +78,16 @@ export default function DashboardPage() {
     if (storedHash) setHash(storedHash)
     if (storedActions) try { setActions(JSON.parse(storedActions)) } catch {}
   }, [])
+
+  // Calculate XP and capabilities when profile changes
+  useEffect(() => {
+    if (profile) {
+      const xp = calculateXP(profile)
+      setAgentXP(xp)
+      setCapabilities(calculateCapabilities(profile))
+      setMilestones(getUnlockedMilestones(xp, profile))
+    }
+  }, [profile, actions])
 
   const executeAction = async () => {
     if (!actionPrompt.trim() || !profile) return
@@ -85,6 +103,9 @@ export default function DashboardPage() {
       const updated = [newAction, ...actions]
       setActions(updated)
       localStorage.setItem('elitActions', JSON.stringify(updated))
+      // Track action count for XP
+      const count = parseInt(localStorage.getItem('elitActionCount') || '0') + 1
+      localStorage.setItem('elitActionCount', count.toString())
       setActionPrompt('')
     } catch (err) { console.error(err) }
     setIsExecuting(false)
@@ -185,12 +206,20 @@ export default function DashboardPage() {
           <AnimatePresence mode="wait">
             {tab === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-                {/* Profile */}
+                {/* Profile + XP */}
                 <motion.div variants={fadeUp} className="elite-card rounded-2xl p-6">
-                  <div className="flex items-start gap-4 mb-6">
-                    <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="relative">
+                      <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
+                      <div className="absolute -bottom-1 -right-1">
+                        <LevelBadge xp={agentXP} size="sm" />
+                      </div>
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-base font-semibold text-white/90">{profile.name}&apos;s Elit</h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base font-semibold text-white/90">{profile.name}&apos;s Elit</h2>
+                        <LevelBadge xp={agentXP} size="sm" showTier />
+                      </div>
                       <p className="text-[13px] text-white/45 mt-0.5 line-clamp-1 font-light">{profile.bio}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="relative flex h-1.5 w-1.5">
@@ -203,6 +232,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* XP Progress Bar */}
+                  <div className="mb-5">
+                    <XPBar xp={agentXP} />
+                  </div>
+
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-amber-300/50' },
@@ -219,6 +254,38 @@ export default function DashboardPage() {
                   </div>
                 </motion.div>
 
+                {/* Capability Chart + Milestones */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Brain className="w-3.5 h-3.5 text-amber-300/40" />
+                      <h3 className="text-[13px] font-medium text-white/60">Agent Capabilities</h3>
+                    </div>
+                    <CapabilityChart capabilities={capabilities} size={160} />
+                  </motion.div>
+
+                  <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Trophy className="w-3.5 h-3.5 text-amber-300/40" />
+                      <h3 className="text-[13px] font-medium text-white/60">Milestones</h3>
+                      <span className="text-[10px] text-white/20 ml-auto">{milestones.length}/9</span>
+                    </div>
+                    <div className="space-y-2">
+                      {milestones.length > 0 ? milestones.slice(0, 5).map(m => (
+                        <div key={m.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.03]">
+                          <span className="text-sm">{m.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-medium text-white/50">{m.name}</p>
+                            <p className="text-[9px] text-white/25">{m.description}</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <p className="text-center text-[12px] text-white/20 py-6">Train your Elit to unlock milestones</p>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+
                 {hash && (
                   <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-3">
@@ -232,12 +299,13 @@ export default function DashboardPage() {
                 )}
 
                 {/* Quick actions */}
-                <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                   {[
                     { href: '/train', icon: Mic, title: 'Train', desc: 'Chat or voice' },
                     { href: '/chat/default', icon: MessageSquare, title: 'Chat', desc: 'Test your agent' },
                     { href: '/verify/default', icon: ShieldCheck, title: 'Verify', desc: 'On-chain proof' },
                     { href: '/turing', icon: Eye, title: 'Turing Test', desc: 'Real vs AI' },
+                    { href: '/explore', icon: Activity, title: 'Explore', desc: 'Agent marketplace' },
                   ].map(action => (
                     <Link key={action.href} href={action.href} className="group elite-card rounded-2xl p-5">
                       <div className="w-9 h-9 rounded-xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mb-3 group-hover:bg-amber-500/[0.1] group-hover:border-amber-500/25 group-hover:scale-105 transition-all duration-500">
