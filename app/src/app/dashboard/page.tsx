@@ -171,7 +171,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Tabs */}
-        <motion.div variants={fadeUp} className="flex gap-0.5 p-1 rounded-xl bg-white/[0.015] border border-white/[0.06] mb-6 w-fit">
+        <motion.div variants={fadeUp} className="flex gap-0.5 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 w-fit">
           {(['overview', 'actions', 'delegations'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-[11px] font-medium transition-all duration-300 capitalize cursor-pointer ${
@@ -210,7 +210,7 @@ export default function DashboardPage() {
                       { label: 'Delegations', value: delegations.filter(d => d.active).length.toString(), icon: Shield, color: 'text-amber-300/40' },
                       { label: 'Status', value: hash ? 'Verified' : 'Pending', icon: ShieldCheck, color: hash ? 'text-emerald-400/50' : 'text-amber-400/50' },
                     ].map(stat => (
-                      <div key={stat.label} className="rounded-xl bg-white/[0.015] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
+                      <div key={stat.label} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
                         <stat.icon className={`w-4 h-4 ${stat.color} mb-3`} />
                         <div className="text-lg font-bold text-white/80">{stat.value}</div>
                         <div className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</div>
@@ -225,7 +225,7 @@ export default function DashboardPage() {
                       <Brain className="w-3.5 h-3.5 text-amber-300/40" />
                       <h3 className="text-[13px] font-medium text-white/60">Personality Hash</h3>
                     </div>
-                    <div className="bg-white/[0.015] border border-white/[0.06] p-4 rounded-xl">
+                    <div className="bg-white/[0.04] border border-white/[0.06] p-4 rounded-xl">
                       <p className="font-mono text-[11px] text-amber-300/30 break-all">{hash}</p>
                     </div>
                   </motion.div>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                       {actions.slice(0, 3).map(action => {
                         const Icon = ACTION_ICONS[action.type]
                         return (
-                          <div key={action.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                          <div key={action.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                             <Icon className="w-3.5 h-3.5 text-amber-300/30 shrink-0" />
                             <span className="text-[12px] text-white/30 flex-1 truncate font-light">{action.prompt}</span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full ${
@@ -291,7 +291,7 @@ export default function DashboardPage() {
                           className={`flex items-center gap-2 p-3 rounded-xl border text-[11px] font-medium transition-all duration-300 cursor-pointer ${
                             actionType === type
                               ? 'border-amber-500/25 bg-amber-500/[0.06] text-amber-300/60'
-                              : 'border-white/[0.06] bg-white/[0.01] text-white/45 hover:border-white/[0.06]'
+                              : 'border-white/[0.06] bg-white/[0.03] text-white/45 hover:border-white/[0.06]'
                           }`}
                         >
                           <Icon className="w-3 h-3" /> {ACTION_LABELS[type]}
@@ -320,7 +320,7 @@ export default function DashboardPage() {
                       {actions.map(action => {
                         const Icon = ACTION_ICONS[action.type]
                         return (
-                          <motion.div key={action.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.015] border border-white/[0.06] p-4">
+                          <motion.div key={action.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-4">
                             <div className="flex items-center gap-3 mb-3">
                               <Icon className="w-3.5 h-3.5 text-amber-300/30" />
                               <div className="flex-1 min-w-0">
@@ -333,7 +333,7 @@ export default function DashboardPage() {
                               </div>
                             </div>
                             {action.result && (
-                              <div className="bg-white/[0.01] border border-white/[0.02] rounded-lg p-3">
+                              <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
                                 <p className="text-[11px] text-white/25 whitespace-pre-wrap leading-relaxed font-light">{action.result}</p>
                               </div>
                             )}
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                             {['chat', 'post', 'code', 'research', 'full'].map(scope => (
                               <button key={scope} onClick={() => setNewScopes(prev => prev.includes(scope) ? prev.filter(s => s !== scope) : [...prev, scope])}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all capitalize cursor-pointer ${
-                                  newScopes.includes(scope) ? 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300/60' : 'border-white/[0.08] bg-white/[0.015] text-white/45 hover:border-white/[0.08]'
+                                  newScopes.includes(scope) ? 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300/60' : 'border-white/[0.08] bg-white/[0.04] text-white/45 hover:border-white/[0.08]'
                                 }`}>{scope}</button>
                             ))}
                           </div>
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                   <div className="space-y-3">
                     {delegations.map(del => (
                       <motion.div key={del.id} layout className={`rounded-xl border p-4 transition-all duration-500 ${
-                        del.active ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-red-500/[0.01] border-red-500/[0.06] opacity-50'
+                        del.active ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-red-500/[0.01] border-red-500/[0.06] opacity-50'
                       }`}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex flex-wrap gap-1">

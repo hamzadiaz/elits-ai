@@ -104,7 +104,7 @@ export default function VerifyElitPage() {
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', bounce: 0.4, delay: 0.1 }}
             className="relative w-20 h-20 mx-auto mb-6">
             <div className={`absolute inset-0 rounded-full ${isActive ? 'bg-emerald-400/[0.04]' : 'bg-red-400/[0.04]'} animate-pulse-glow`} />
-            <div className={`absolute inset-0 rounded-full bg-white/[0.015] border ${isActive ? 'border-emerald-400/[0.15]' : 'border-red-400/[0.15]'} flex items-center justify-center backdrop-blur-sm`}>
+            <div className={`absolute inset-0 rounded-full bg-white/[0.04] border ${isActive ? 'border-emerald-400/[0.15]' : 'border-red-400/[0.15]'} flex items-center justify-center backdrop-blur-sm`}>
               {isActive ? <ShieldCheck className="w-8 h-8 text-emerald-400/50" /> : <AlertTriangle className="w-8 h-8 text-red-400/50" />}
             </div>
           </motion.div>
@@ -152,7 +152,7 @@ export default function VerifyElitPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-2.5">
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                   <User className="w-3.5 h-3.5 text-amber-300/30 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-white/40 mb-1 uppercase tracking-wider">Owner Wallet</p>
@@ -165,7 +165,7 @@ export default function VerifyElitPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                   <Fingerprint className="w-3.5 h-3.5 text-amber-300/30 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-white/40 mb-1 uppercase tracking-wider">Personality Hash</p>
@@ -181,14 +181,14 @@ export default function VerifyElitPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                     <Calendar className="w-3.5 h-3.5 text-amber-300/25 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-[10px] text-white/40 mb-0.5 uppercase tracking-wider">Created</p>
                       <p className="text-[11px] text-white/50 font-light">{creationDate}</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                     <Clock className="w-3.5 h-3.5 text-emerald-400/30 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-[10px] text-white/40 mb-0.5 uppercase tracking-wider">Source</p>
@@ -197,7 +197,7 @@ export default function VerifyElitPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.06]">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                   <Globe className="w-3.5 h-3.5 text-amber-300/25 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-[10px] text-white/40 mb-1 uppercase tracking-wider">Network</p>
@@ -238,7 +238,7 @@ export default function VerifyElitPage() {
               </a>
               {elitPDA && (
                 <a href={explorerAccountUrl(elitPDA.toBase58())} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/40 hover:text-white/60 transition-all text-[13px]">
+                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/40 hover:text-white/60 transition-all text-[13px]">
                   <ExternalLink className="w-3.5 h-3.5" /> Explorer
                 </a>
               )}

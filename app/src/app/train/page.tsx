@@ -168,7 +168,7 @@ export default function TrainPage() {
             ].map(m => (
               <button key={m.mode} onClick={() => setMode(m.mode)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[12px] transition-all duration-300 cursor-pointer ${
-                  mode === m.mode ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.015] text-white/45 border border-white/[0.06] hover:border-white/[0.06]'
+                  mode === m.mode ? 'bg-amber-500/[0.1] text-amber-300/60 border border-amber-500/25' : 'bg-white/[0.04] text-white/45 border border-white/[0.06] hover:border-white/[0.06]'
                 }`}>
                 <m.icon className="w-3.5 h-3.5" /> {m.label}
               </button>

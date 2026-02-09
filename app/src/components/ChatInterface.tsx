@@ -47,7 +47,7 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
               <div className={`max-w-[80%] sm:max-w-[70%] ${
                 msg.role === 'user'
                   ? 'bg-amber-500/[0.06] border border-amber-500/20 text-white/70'
-                  : 'bg-white/[0.015] border border-white/[0.06] text-white/40'
+                  : 'bg-white/[0.04] border border-white/[0.06] text-white/40'
               } rounded-2xl px-4 py-3`}>
                 {msg.role === 'elit' && (
                   <div className="flex items-center gap-1.5 mb-1.5">
@@ -65,7 +65,7 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
 
         {isLoading && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="bg-white/[0.015] border border-white/[0.06] rounded-2xl px-4 py-3">
+            <div className="bg-white/[0.04] border border-white/[0.06] rounded-2xl px-4 py-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <div className="w-3.5 h-3.5 rounded-md bg-amber-500/[0.1] flex items-center justify-center">
                   <Brain className="w-2 h-2 text-amber-300/40" />
@@ -96,7 +96,7 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
             className="elite-input flex-1 pr-10"
             style={{ maxHeight: '120px' }}
           />
-          <button className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/35 hover:text-amber-300/40 hover:border-amber-500/20 transition-all shrink-0 cursor-pointer" title="Voice">
+          <button className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/35 hover:text-amber-300/40 hover:border-amber-500/20 transition-all shrink-0 cursor-pointer" title="Voice">
             <Mic className="w-3.5 h-3.5" />
           </button>
           <button onClick={handleSubmit} disabled={!input.trim() || isLoading}

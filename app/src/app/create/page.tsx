@@ -305,7 +305,7 @@ export default function CreateElitPage() {
                       className={`w-full px-3 py-2 rounded-lg text-[12px] text-left transition-all duration-300 cursor-pointer ${
                         profile.communicationStyle[field] === opt
                           ? 'bg-amber-500/[0.1] text-amber-300/70 border border-amber-500/25'
-                          : 'bg-white/[0.01] text-white/25 hover:bg-white/[0.03] border border-transparent'
+                          : 'bg-white/[0.03] text-white/25 hover:bg-white/[0.03] border border-transparent'
                       }`}
                     >
                       {opt.charAt(0).toUpperCase() + opt.slice(1)}
@@ -383,7 +383,7 @@ export default function CreateElitPage() {
         <button onClick={() => router.push('/train')} className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
           Train Your Elit <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
         </button>
-        <button onClick={() => router.push('/dashboard')} className="px-7 py-3 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/30 font-medium text-[13px] hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer">
+        <button onClick={() => router.push('/dashboard')} className="px-7 py-3 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/30 font-medium text-[13px] hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer">
           Dashboard
         </button>
       </div>
@@ -419,7 +419,7 @@ export default function CreateElitPage() {
           <div className="flex justify-between mt-10">
             <button
               onClick={() => setStep(s => Math.max(0, s - 1))}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.015] text-white/25 hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer ${step === 0 ? 'invisible' : ''}`}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/25 hover:text-white/50 hover:border-white/[0.08] transition-all cursor-pointer ${step === 0 ? 'invisible' : ''}`}
             >
               <ChevronLeft className="w-3.5 h-3.5" /> Back
             </button>

@@ -36,10 +36,10 @@ body {
 
 /* ──── ELITE GLASS CARD ──── */
 .glass {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(40px) saturate(1.2);
   -webkit-backdrop-filter: blur(40px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-hover:hover {
@@ -51,10 +51,10 @@ body {
 /* Elite card with ultra-thin border */
 .elite-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -334,6 +334,48 @@ body {
   animation-play-state: running;
 }
 
+/* ──── WALLET ADAPTER OVERRIDES ──── */
+.wallet-adapter-modal-wrapper {
+  background: rgba(10, 10, 6, 0.95) !important;
+  backdrop-filter: blur(40px) !important;
+}
+
+.wallet-adapter-modal-title {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+.wallet-adapter-modal-list li {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.wallet-adapter-modal-list li:hover {
+  background: rgba(212, 160, 23, 0.08) !important;
+  border-color: rgba(212, 160, 23, 0.2) !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.wallet-adapter-modal-middle-button {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.wallet-adapter-modal .wallet-adapter-modal-middle {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Fix any wallet adapter text that's too dim */
+.wallet-adapter-modal * {
+  color: inherit;
+}
+
+.wallet-adapter-button {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
 /* ──── SELECTION ──── */
 ::selection {
   background: rgba(212, 160, 23, 0.3);
@@ -358,7 +400,7 @@ body {
 }
 
 .elite-input::placeholder {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .elite-input:focus {
