@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
   metadataBase: new URL('https://elits-ai.vercel.app'),
 }

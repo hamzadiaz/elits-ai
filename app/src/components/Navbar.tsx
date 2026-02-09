@@ -49,7 +49,7 @@ export function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="relative w-8 h-8 flex items-center justify-center overflow-hidden">
-                <img src="/favicon.svg" alt="Elits AI" className="w-full h-full" />
+                <img src="/logo.png" alt="Elits AI" className="w-full h-full object-contain" />
               </div>
               <span className="font-semibold text-base tracking-tight">
                 <span className="text-white/90">Elits</span>
