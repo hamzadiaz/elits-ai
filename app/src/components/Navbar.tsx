@@ -48,10 +48,8 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-8 h-8 flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt="Elits AI" className="w-full h-full object-contain" />
-              </div>
-              <span className="font-semibold text-base tracking-tight">
+              <img src="/logo.png" alt="Elits AI" className="h-9 w-auto object-contain" />
+              <span className="font-semibold text-lg tracking-tight">
                 <span className="text-white/90">Elits</span>
                 <span className="gradient-text ml-0.5 font-bold">AI</span>
               </span>
