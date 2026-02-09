@@ -1,46 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 
-// Locked-down style prompt for maximum consistency
-const BASE_STYLE = `Transform this photo into a Holographic Neural Portrait. Follow these EXACT rules with NO deviation:
-
-MANDATORY STYLE:
-- The person's face must be clearly recognizable
-- Translucent golden circuit-board patterns overlay the skin, tracing along cheekbones, jawline, forehead, and neck
-- Data stream lines flow vertically and horizontally across the face with a subtle glow
-- Eyes glow with warm amber/gold light
-- Hair transforms into flowing golden energy strands made of light particles
-- Horizontal holographic scan lines across the image (subtle, not overpowering)
-- Small floating light particles scattered around the head and shoulders
-
-MANDATORY COLORS:
-- Primary glow: Gold (#D4A017) and Amber (#FFBF00)
-- Secondary: Warm white highlights (#FFF8E1)
-- Background: PURE BLACK (#000000) — absolutely no gradients or scenery
-- All circuit patterns and data streams in gold/amber tones
-
-MANDATORY COMPOSITION:
-- Centered face, looking DIRECTLY at camera (front-facing)
-- Head and upper shoulders visible
-- Pure black background with NO elements behind the person
-- Square crop, portrait style
-- The person should look powerful, ethereal, futuristic
-- High detail on facial features — this is a premium AI portrait
-
-DO NOT: Add any text, watermarks, logos, borders, or frames. Output ONLY the transformed image.`
-
-const ANGLE_PROMPTS: Record<string, string> = {
-  front: BASE_STYLE,
-  left: BASE_STYLE.replace(
-    'looking DIRECTLY at camera (front-facing)',
-    'face turned approximately 25 degrees to THEIR LEFT (camera right), eyes looking toward camera'
-  ),
-  right: BASE_STYLE.replace(
-    'looking DIRECTLY at camera (front-facing)',
-    'face turned approximately 25 degrees to THEIR RIGHT (camera left), eyes looking toward camera'
-  ),
+// Load reference image at build time (base64)
+let REFERENCE_IMAGE_B64: string | null = null
+try {
+  const refPath = join(process.cwd(), 'public', 'avatar-reference.png')
+  REFERENCE_IMAGE_B64 = readFileSync(refPath).toString('base64')
+} catch {
+  console.warn('[avatar] Reference image not found at public/avatar-reference.png')
 }
+
+const STYLE_PROMPT = `You are given TWO images:
+1. A REFERENCE IMAGE showing the exact artistic style I want (holographic neural portrait with golden circuits, amber glow, black background)
+2. A PHOTO of a real person
+
+Your task: Transform the person in image #2 to match the EXACT style of image #1. 
+
+CRITICAL RULES:
+- The person's face must be clearly recognizable from their photo
+- Copy the EXACT same style as the reference: golden circuit patterns on skin, glowing amber eyes, hair becoming golden energy strands, floating light particles, pure black background
+- Match the reference image's color palette EXACTLY: gold (#D4A017), amber (#FFBF00), warm white highlights
+- Centered face, looking directly at camera, head and upper shoulders
+- Square crop, portrait style
+- DO NOT add any text, watermarks, or borders
+- Output ONLY the transformed image`
 
 const IMAGE_MODELS = [
   'gemini-2.5-flash-image',
@@ -48,21 +34,30 @@ const IMAGE_MODELS = [
 ]
 
 async function generateImage(model: string, mimeType: string, imageData: string, prompt: string): Promise<string | null> {
+  // Build parts: reference image first, then user photo, then prompt
+  const parts: Array<Record<string, unknown>> = []
+  
+  // Add reference image if available
+  if (REFERENCE_IMAGE_B64) {
+    parts.push({ inlineData: { mimeType: 'image/png', data: REFERENCE_IMAGE_B64 } })
+  }
+  
+  // Add user's photo
+  parts.push({ inlineData: { mimeType, data: imageData } })
+  
+  // Add prompt
+  parts.push({ text: prompt })
+
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
-          parts: [
-            { inlineData: { mimeType, data: imageData } },
-            { text: prompt },
-          ],
-        }],
+        contents: [{ parts }],
         generationConfig: {
           responseModalities: ['IMAGE', 'TEXT'],
-          temperature: 0.4, // Lower temperature = more consistent
+          temperature: 0.2, // Very low for maximum consistency
         },
       }),
     }
@@ -74,8 +69,8 @@ async function generateImage(model: string, mimeType: string, imageData: string,
   }
 
   const data = await response.json()
-  const parts = data.candidates?.[0]?.content?.parts || []
-  for (const part of parts) {
+  const responseParts = data.candidates?.[0]?.content?.parts || []
+  for (const part of responseParts) {
     if (part.inlineData?.data) {
       return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`
     }
@@ -97,7 +92,7 @@ async function generateWithFallback(mimeType: string, imageData: string, prompt:
 
 export async function POST(req: NextRequest) {
   try {
-    const { image, mimeType, mode } = await req.json()
+    const { image, mimeType } = await req.json()
 
     if (!image || !mimeType) {
       return NextResponse.json({ error: 'Image data required' }, { status: 400 })
@@ -111,43 +106,16 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Mode: 'single' (default) or '3d' (generates 3 angles)
-    if (mode === '3d') {
-      console.log('[avatar] Generating 3D avatar (3 angles)...')
-      
-      // Generate all 3 angles in parallel
-      const [front, left, right] = await Promise.all([
-        generateWithFallback(mimeType, image, ANGLE_PROMPTS.front),
-        generateWithFallback(mimeType, image, ANGLE_PROMPTS.left),
-        generateWithFallback(mimeType, image, ANGLE_PROMPTS.right),
-      ])
-
-      if (front) {
-        return NextResponse.json({
-          avatarUrl: front,
-          avatarAngles: {
-            front: front,
-            left: left || front, // fallback to front if angle fails
-            right: right || front,
-          },
-          generated: true,
-          is3d: true,
-          message: 'AI-generated 3D Holographic Neural Portrait',
-        })
-      }
-    } else {
-      // Single image generation (default)
-      console.log('[avatar] Generating single avatar...')
-      const result = await generateWithFallback(mimeType, image, ANGLE_PROMPTS.front)
-      
-      if (result) {
-        return NextResponse.json({
-          avatarUrl: result,
-          generated: true,
-          is3d: false,
-          message: 'AI-generated Holographic Neural Portrait',
-        })
-      }
+    console.log('[avatar] Generating avatar with reference image...')
+    const result = await generateWithFallback(mimeType, image, STYLE_PROMPT)
+    
+    if (result) {
+      return NextResponse.json({
+        avatarUrl: result,
+        generated: true,
+        is3d: false,
+        message: 'AI-generated Holographic Neural Portrait',
+      })
     }
 
     // Fallback
