@@ -4,29 +4,41 @@ import { join } from 'path'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 
-// Load reference image at build time (base64)
-let REFERENCE_IMAGE_B64: string | null = null
-try {
-  const refPath = join(process.cwd(), 'public', 'avatar-reference.png')
-  REFERENCE_IMAGE_B64 = readFileSync(refPath).toString('base64')
-} catch {
-  console.warn('[avatar] Reference image not found at public/avatar-reference.png')
+// Load reference image lazily (works on Vercel serverless)
+let _refCache: string | null | undefined = undefined
+function getRefImage(): string | null {
+  if (_refCache !== undefined) return _refCache
+  try {
+    const refPath = join(process.cwd(), 'public', 'avatar-reference.png')
+    _refCache = readFileSync(refPath).toString('base64')
+    console.log('[avatar] Reference image loaded:', _refCache.length, 'bytes b64')
+  } catch (e) {
+    console.warn('[avatar] Reference image not found:', e)
+    _refCache = null
+  }
+  return _refCache
 }
 
-const STYLE_PROMPT = `You are given TWO images:
-1. A REFERENCE IMAGE showing the exact artistic style I want (holographic neural portrait with golden circuits, amber glow, black background)
-2. A PHOTO of a real person
+const STYLE_PROMPT = `I'm giving you two images. The FIRST image is the STYLE REFERENCE — you must replicate its exact visual style. The SECOND image is a photo of a person whose face you must use.
 
-Your task: Transform the person in image #2 to match the EXACT style of image #1. 
+CREATE a new portrait that:
+1. Uses the EXACT face/features from the person's photo (image #2)
+2. Applies the IDENTICAL artistic style from the reference (image #1):
+   - Pure black background (#000000), no gradients
+   - Golden holographic circuit board patterns overlaid on the skin (thin gold lines forming circuit/PCB traces across forehead, cheeks, jaw, neck)
+   - Warm golden-amber glow emanating from the face and hair
+   - Hair transformed into flowing golden energy/light strands
+   - Eyes glowing amber/gold
+   - Tiny floating golden light particles and sparks around the head
+   - Horizontal digital scan lines/glitch streaks in the golden glow
+   - Neck and upper chest showing circuit traces fading into darkness
+   - Overall color palette: ONLY gold (#D4A017), amber (#FFBF00), warm white, on pure black
+   - Centered symmetrical composition, face looking straight ahead
+   - Square format, head and upper shoulders only
 
-CRITICAL RULES:
-- The person's face must be clearly recognizable from their photo
-- Copy the EXACT same style as the reference: golden circuit patterns on skin, glowing amber eyes, hair becoming golden energy strands, floating light particles, pure black background
-- Match the reference image's color palette EXACTLY: gold (#D4A017), amber (#FFBF00), warm white highlights
-- Centered face, looking directly at camera, head and upper shoulders
-- Square crop, portrait style
-- DO NOT add any text, watermarks, or borders
-- Output ONLY the transformed image`
+CRITICAL: The output must look like it belongs in the SAME series as the reference image. Same lighting. Same circuit pattern density. Same glow intensity. Same black background. Same color temperature. An observer should think both images were made by the same artist in the same session.
+
+DO NOT add text, watermarks, borders, or any elements not present in the reference.`
 
 const IMAGE_MODELS = [
   'gemini-2.5-flash-image',
@@ -38,8 +50,11 @@ async function generateImage(model: string, mimeType: string, imageData: string,
   const parts: Array<Record<string, unknown>> = []
   
   // Add reference image if available
-  if (REFERENCE_IMAGE_B64) {
-    parts.push({ inlineData: { mimeType: 'image/png', data: REFERENCE_IMAGE_B64 } })
+  const refB64 = getRefImage()
+  if (refB64) {
+    parts.push({ inlineData: { mimeType: 'image/jpeg', data: refB64 } })
+  } else {
+    console.warn('[avatar] No reference image available — output may not match style')
   }
   
   // Add user's photo
