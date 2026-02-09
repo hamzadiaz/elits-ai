@@ -1,10 +1,17 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
+
+interface AvatarAngles {
+  front: string
+  left: string
+  right: string
+}
 
 interface Avatar3DProps {
   avatarUrl?: string | null
+  avatarAngles?: AvatarAngles | null
   name: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   state?: 'idle' | 'speaking' | 'thinking'
@@ -17,14 +24,52 @@ const sizes = {
   xl: { container: 'w-48 h-48', text: 'text-6xl', ring: 'w-52 h-52' },
 }
 
-export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avatar3DProps) {
+export function Avatar3D({ avatarUrl, avatarAngles, name, size = 'md', state = 'idle' }: Avatar3DProps) {
   const [imgError, setImgError] = useState(false)
+  const [mouseX, setMouseX] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
   const s = sizes[size]
   const initial = name?.charAt(0)?.toUpperCase() || '?'
   const hasImage = avatarUrl && !imgError
+  const has3D = avatarAngles && avatarAngles.left && avatarAngles.right
+
+  // Mouse tracking for 3D effect
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const normalizedX = (e.clientX - centerX) / (rect.width / 2) // -1 to 1
+    setMouseX(Math.max(-1, Math.min(1, normalizedX)))
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    setMouseX(0) // Reset to front
+  }, [])
+
+  // Determine which image to show based on mouse position
+  const getCurrentImage = () => {
+    if (!has3D) return avatarUrl
+    if (mouseX < -0.3) return avatarAngles.left
+    if (mouseX > 0.3) return avatarAngles.right
+    return avatarAngles.front
+  }
+
+  // Calculate CSS 3D transform based on mouse
+  const get3DTransform = () => {
+    if (!has3D) return {}
+    return {
+      transform: `perspective(600px) rotateY(${mouseX * 15}deg) rotateX(${-Math.abs(mouseX) * 3}deg)`,
+      transition: 'transform 0.15s ease-out',
+    }
+  }
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div
+      ref={containerRef}
+      className="relative flex items-center justify-center"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Outer glow ring */}
       <motion.div
         className={`absolute ${s.ring} rounded-full`}
@@ -58,11 +103,12 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
         />
       )}
 
-      {/* Main avatar container */}
+      {/* Main avatar container with 3D transform */}
       <motion.div
-        className={`relative ${s.container} rounded-full overflow-hidden border-2 border-primary/30 shadow-[0_0_30px_rgba(212,160,23,0.2)]`}
+        className={`relative ${s.container} rounded-full overflow-hidden border-2 border-primary/30 shadow-[0_0_30px_rgba(212,160,23,0.2)] ${has3D ? 'cursor-grab' : ''}`}
+        style={get3DTransform()}
         animate={
-          state === 'idle'
+          state === 'idle' && !has3D
             ? { y: [0, -4, 0] }
             : state === 'speaking'
               ? { scale: [1, 1.03, 1] }
@@ -76,7 +122,7 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
       >
         {hasImage ? (
           <img
-            src={avatarUrl}
+            src={getCurrentImage() || avatarUrl || ''}
             alt={`${name}'s avatar`}
             className="w-full h-full object-cover"
             onError={() => setImgError(true)}
@@ -87,18 +133,30 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
           </div>
         )}
 
-        {/* Holographic overlay */}
+        {/* Holographic overlay with 3D-aware lighting */}
         <motion.div
           className="absolute inset-0 rounded-full pointer-events-none"
-          animate={{
+          style={has3D ? {
+            background: `linear-gradient(${90 + mouseX * 45}deg, rgba(212,160,23,${0.05 + Math.abs(mouseX) * 0.15}) 0%, transparent 50%, rgba(240,201,64,${0.05 + Math.abs(mouseX) * 0.1}) 100%)`,
+          } : undefined}
+          animate={!has3D ? {
             background: [
               'linear-gradient(135deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
               'linear-gradient(225deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
               'linear-gradient(135deg, rgba(212,160,23,0.1) 0%, transparent 50%, rgba(240,201,64,0.1) 100%)',
             ],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          } : undefined}
+          transition={!has3D ? { duration: 4, repeat: Infinity, ease: 'easeInOut' } : undefined}
         />
+
+        {/* Scan line effect for 3D mode */}
+        {has3D && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-full opacity-20">
+            <div className="absolute inset-0" style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,160,23,0.1) 2px, rgba(212,160,23,0.1) 3px)',
+            }} />
+          </div>
+        )}
 
         {/* Thinking spinner */}
         {state === 'thinking' && (
@@ -111,6 +169,13 @@ export function Avatar3D({ avatarUrl, name, size = 'md', state = 'idle' }: Avata
           </div>
         )}
       </motion.div>
+
+      {/* 3D indicator */}
+      {has3D && (
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[9px] text-amber-400/40 font-mono tracking-wider">
+          3D
+        </div>
+      )}
     </div>
   )
 }

@@ -125,12 +125,12 @@ export default function CreateElitPage() {
         const res = await fetch('/api/avatar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64, mimeType: file.type }),
+          body: JSON.stringify({ image: base64, mimeType: file.type, mode: '3d' }),
         })
         const data = await res.json()
         if (data.avatarUrl) {
           setAvatarPreview(data.avatarUrl)
-          setProfile(p => ({ ...p, avatarUrl: data.avatarUrl }))
+          setProfile(p => ({ ...p, avatarUrl: data.avatarUrl, avatarAngles: data.avatarAngles }))
         }
       } catch (err) {
         console.error('Avatar generation failed:', err)
@@ -259,9 +259,9 @@ export default function CreateElitPage() {
                         try {
                           const base64 = avatarPreview.split(',')[1]
                           const mime = avatarPreview.split(';')[0].split(':')[1] || 'image/png'
-                          const res = await fetch('/api/avatar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: base64, mimeType: mime }) })
+                          const res = await fetch('/api/avatar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: base64, mimeType: mime, mode: '3d' }) })
                           const data = await res.json()
-                          if (data.avatarUrl) { setAvatarPreview(data.avatarUrl); setProfile(p => ({ ...p, avatarUrl: data.avatarUrl })) }
+                          if (data.avatarUrl) { setAvatarPreview(data.avatarUrl); setProfile(p => ({ ...p, avatarUrl: data.avatarUrl, avatarAngles: data.avatarAngles })) }
                         } catch (err) { console.error(err) }
                         setGeneratingAvatar(false)
                       }} className="text-[11px] text-amber-300/40 hover:text-amber-300/60 transition-colors cursor-pointer text-left">🔄 Regenerate</button>

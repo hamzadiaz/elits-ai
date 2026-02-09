@@ -2,41 +2,52 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 
-const AVATAR_STYLE_PROMPT = `Transform this photo into a Holographic Neural Portrait avatar with these EXACT specifications:
+// Locked-down style prompt for maximum consistency
+const BASE_STYLE = `Transform this photo into a Holographic Neural Portrait. Follow these EXACT rules with NO deviation:
 
-STYLE: Futuristic holographic AI portrait
-- Translucent skin with visible flowing data streams underneath the surface
-- Glowing circuit-like patterns tracing along the face, jawline, and neck
-- Eyes emit a soft warm gold light, slightly luminous
-- Hair transforms into flowing energy strands made of light particles
-- Subtle holographic scan lines across the image
+MANDATORY STYLE:
+- The person's face must be clearly recognizable
+- Translucent golden circuit-board patterns overlay the skin, tracing along cheekbones, jawline, forehead, and neck
+- Data stream lines flow vertically and horizontally across the face with a subtle glow
+- Eyes glow with warm amber/gold light
+- Hair transforms into flowing golden energy strands made of light particles
+- Horizontal holographic scan lines across the image (subtle, not overpowering)
+- Small floating light particles scattered around the head and shoulders
 
-COLORS (strict palette):
-- Primary: Gold (#D4A017), Amber (#FFBF00) 
-- Secondary: Warm white (#FFF8E1)
-- Background: Pure black (#000000)
-- Accents: Soft golden glow, amber light trails
+MANDATORY COLORS:
+- Primary glow: Gold (#D4A017) and Amber (#FFBF00)
+- Secondary: Warm white highlights (#FFF8E1)
+- Background: PURE BLACK (#000000) — absolutely no gradients or scenery
+- All circuit patterns and data streams in gold/amber tones
 
-COMPOSITION:
-- Centered face, portrait orientation
-- Pure black background (no gradients, no scenery)
-- The person should be clearly recognizable but stylized as a digital being
-- Clean edges suitable for use as a profile picture
-- Square aspect ratio, high detail on facial features
+MANDATORY COMPOSITION:
+- Centered face, looking DIRECTLY at camera (front-facing)
+- Head and upper shoulders visible
+- Pure black background with NO elements behind the person
+- Square crop, portrait style
+- The person should look powerful, ethereal, futuristic
+- High detail on facial features — this is a premium AI portrait
 
-MOOD: Ethereal, powerful, futuristic — like a sentient AI that emerged from gold light
+DO NOT: Add any text, watermarks, logos, borders, or frames. Output ONLY the transformed image.`
 
-Output ONLY the image, no text overlay.`
+const ANGLE_PROMPTS: Record<string, string> = {
+  front: BASE_STYLE,
+  left: BASE_STYLE.replace(
+    'looking DIRECTLY at camera (front-facing)',
+    'face turned approximately 25 degrees to THEIR LEFT (camera right), eyes looking toward camera'
+  ),
+  right: BASE_STYLE.replace(
+    'looking DIRECTLY at camera (front-facing)',
+    'face turned approximately 25 degrees to THEIR RIGHT (camera left), eyes looking toward camera'
+  ),
+}
 
-// Models that support image generation output, in order of preference
 const IMAGE_MODELS = [
   'gemini-2.5-flash-image',
   'gemini-3-pro-image-preview',
 ]
 
-async function tryGenerateWithModel(model: string, mimeType: string, imageData: string): Promise<{ avatarUrl: string; generated: boolean; message: string } | null> {
-  console.log(`[avatar] Trying model: ${model}`)
-  
+async function generateImage(model: string, mimeType: string, imageData: string, prompt: string): Promise<string | null> {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
     {
@@ -46,81 +57,108 @@ async function tryGenerateWithModel(model: string, mimeType: string, imageData: 
         contents: [{
           parts: [
             { inlineData: { mimeType, data: imageData } },
-            { text: AVATAR_STYLE_PROMPT },
+            { text: prompt },
           ],
         }],
         generationConfig: {
           responseModalities: ['IMAGE', 'TEXT'],
-          temperature: 1,
+          temperature: 0.4, // Lower temperature = more consistent
         },
       }),
     }
   )
 
   if (!response.ok) {
-    const errText = await response.text()
-    console.error(`[avatar] Model ${model} failed (${response.status}):`, errText.slice(0, 200))
+    console.error(`[avatar] Model ${model} failed: ${response.status}`)
     return null
   }
 
   const data = await response.json()
-  console.log(`[avatar] Model ${model} response candidates:`, data.candidates?.length || 0)
-  
   const parts = data.candidates?.[0]?.content?.parts || []
   for (const part of parts) {
     if (part.inlineData?.data) {
-      console.log(`[avatar] Model ${model} returned image! MIME: ${part.inlineData.mimeType}, size: ${part.inlineData.data.length}`)
-      return {
-        avatarUrl: `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`,
-        generated: true,
-        message: 'AI-generated Holographic Neural Portrait',
-      }
+      return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`
     }
   }
+  return null
+}
 
-  console.log(`[avatar] Model ${model} returned no image data in parts:`, parts.map((p: Record<string, unknown>) => Object.keys(p)))
+async function generateWithFallback(mimeType: string, imageData: string, prompt: string): Promise<string | null> {
+  for (const model of IMAGE_MODELS) {
+    try {
+      const result = await generateImage(model, mimeType, imageData, prompt)
+      if (result) return result
+    } catch (err) {
+      console.error(`[avatar] Error with ${model}:`, err)
+    }
+  }
   return null
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { image, mimeType } = await req.json()
+    const { image, mimeType, mode } = await req.json()
 
     if (!image || !mimeType) {
       return NextResponse.json({ error: 'Image data required' }, { status: 400 })
     }
 
     if (!GEMINI_API_KEY) {
-      console.log('[avatar] No GEMINI_API_KEY configured')
       return NextResponse.json({
         avatarUrl: `data:${mimeType};base64,${image}`,
         generated: false,
-        message: 'No API key configured. Using original photo with holographic CSS effects.',
+        message: 'No API key configured.',
       })
     }
 
-    // Try each image generation model
-    for (const model of IMAGE_MODELS) {
-      try {
-        const result = await tryGenerateWithModel(model, mimeType, image)
-        if (result) {
-          return NextResponse.json(result)
-        }
-      } catch (err) {
-        console.error(`[avatar] Error with model ${model}:`, err)
-        continue
+    // Mode: 'single' (default) or '3d' (generates 3 angles)
+    if (mode === '3d') {
+      console.log('[avatar] Generating 3D avatar (3 angles)...')
+      
+      // Generate all 3 angles in parallel
+      const [front, left, right] = await Promise.all([
+        generateWithFallback(mimeType, image, ANGLE_PROMPTS.front),
+        generateWithFallback(mimeType, image, ANGLE_PROMPTS.left),
+        generateWithFallback(mimeType, image, ANGLE_PROMPTS.right),
+      ])
+
+      if (front) {
+        return NextResponse.json({
+          avatarUrl: front,
+          avatarAngles: {
+            front: front,
+            left: left || front, // fallback to front if angle fails
+            right: right || front,
+          },
+          generated: true,
+          is3d: true,
+          message: 'AI-generated 3D Holographic Neural Portrait',
+        })
+      }
+    } else {
+      // Single image generation (default)
+      console.log('[avatar] Generating single avatar...')
+      const result = await generateWithFallback(mimeType, image, ANGLE_PROMPTS.front)
+      
+      if (result) {
+        return NextResponse.json({
+          avatarUrl: result,
+          generated: true,
+          is3d: false,
+          message: 'AI-generated Holographic Neural Portrait',
+        })
       }
     }
 
-    // All models failed — fallback to original photo
-    console.log('[avatar] All image models failed, returning original photo')
+    // Fallback
+    console.log('[avatar] All generation attempts failed, returning original')
     return NextResponse.json({
       avatarUrl: `data:${mimeType};base64,${image}`,
       generated: false,
-      message: 'Image generation unavailable. Using original photo with holographic CSS effects.',
+      message: 'Image generation unavailable. Using original photo.',
     })
   } catch (error) {
-    console.error('[avatar] Avatar generation error:', error)
+    console.error('[avatar] Error:', error)
     return NextResponse.json({ error: 'Failed to generate avatar' }, { status: 500 })
   }
 }
