@@ -113,7 +113,10 @@ export default function DashboardPage() {
     setIsExecuting(false)
   }
 
-  const revokeDelegation = (id: string) => setDelegations(prev => prev.map(d => d.id === id ? { ...d, active: false } : d))
+  const revokeDelegation = (id: string) => {
+    setDelegations(prev => prev.map(d => d.id === id ? { ...d, active: false } : d))
+    addToast({ type: 'success', message: 'Delegation revoked', duration: 3000 })
+  }
 
   const createDelegation = async () => {
     if (newScopes.length === 0) return
