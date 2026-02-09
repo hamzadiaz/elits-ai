@@ -48,9 +48,8 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-7 h-7 rounded-lg bg-gradient-to-br from-amber-600 to-amber-500 flex items-center justify-center overflow-hidden">
-                <Zap className="w-3.5 h-3.5 text-white/90 relative z-10" fill="currentColor" />
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-amber-500-light opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative w-8 h-8 flex items-center justify-center overflow-hidden">
+                <img src="/favicon.svg" alt="Elits AI" className="w-full h-full" />
               </div>
               <span className="font-semibold text-base tracking-tight">
                 <span className="text-white/90">Elits</span>

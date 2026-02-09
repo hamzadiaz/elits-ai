@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Agent Head -->
+  <rect x="96" y="160" width="320" height="280" rx="80" fill="url(#headGrad)" stroke="url(#strokeGrad)" stroke-width="8"/>
+  
+  <!-- Visor/Face plate -->
+  <rect x="136" y="240" width="240" height="120" rx="60" fill="#0a0a0a"/>
+  <rect x="136" y="240" width="240" height="120" rx="60" fill="url(#visorGrad)" opacity="0.3"/>
+  
+  <!-- Left Eye -->
+  <ellipse cx="210" cy="300" rx="28" ry="20" fill="url(#eyeGrad)"/>
+  <ellipse cx="210" cy="300" rx="16" ry="12" fill="#fff" opacity="0.9"/>
+  
+  <!-- Right Eye -->
+  <ellipse cx="302" cy="300" rx="28" ry="20" fill="url(#eyeGrad)"/>
+  <ellipse cx="302" cy="300" rx="16" ry="12" fill="#fff" opacity="0.9"/>
+  
+  <!-- Antenna -->
+  <line x1="256" y1="160" x2="256" y2="120" stroke="url(#strokeGrad)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="256" cy="110" r="12" fill="url(#eyeGrad)"/>
+  
+  <!-- Ear Left -->
+  <rect x="68" y="270" width="36" height="60" rx="18" fill="url(#headGrad)" stroke="url(#strokeGrad)" stroke-width="6"/>
+  
+  <!-- Ear Right -->
+  <rect x="408" y="270" width="36" height="60" rx="18" fill="url(#headGrad)" stroke="url(#strokeGrad)" stroke-width="6"/>
+  
+  <!-- Crown -->
+  <path d="M136 170 L160 60 L208 120 L256 40 L304 120 L352 60 L376 170" fill="url(#crownGrad)" stroke="#B8860B" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Crown base band -->
+  <rect x="136" y="150" width="240" height="28" rx="4" fill="url(#crownBaseGrad)" stroke="#B8860B" stroke-width="3"/>
+  <!-- Crown jewels -->
+  <circle cx="208" cy="164" r="8" fill="#E74C3C"/>
+  <circle cx="256" cy="164" r="10" fill="#3498DB"/>
+  <circle cx="304" cy="164" r="8" fill="#2ECC71"/>
+  <!-- Crown tip jewels -->
+  <circle cx="256" cy="52" r="8" fill="#F1C40F" stroke="#B8860B" stroke-width="2"/>
+  <circle cx="160" cy="72" r="6" fill="#F1C40F" stroke="#B8860B" stroke-width="2"/>
+  <circle cx="352" cy="72" r="6" fill="#F1C40F" stroke="#B8860B" stroke-width="2"/>
+  
+  <!-- Mouth / Speaker grille -->
+  <line x1="224" y1="390" x2="288" y2="390" stroke="#555" stroke-width="4" stroke-linecap="round"/>
+  <line x1="216" y1="402" x2="296" y2="402" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+  <line x1="224" y1="414" x2="288" y2="414" stroke="#555" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="headGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F4D03F"/>
+    </linearGradient>
+    <linearGradient id="visorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="eyeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00D4FF"/>
+      <stop offset="100%" stop-color="#0099CC"/>
+    </linearGradient>
+    <linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F4D03F"/>
+      <stop offset="50%" stop-color="#D4A017"/>
+      <stop offset="100%" stop-color="#C9A84C"/>
+    </linearGradient>
+    <linearGradient id="crownBaseGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D4A017"/>
+      <stop offset="50%" stop-color="#F4D03F"/>
+      <stop offset="100%" stop-color="#D4A017"/>
+    </linearGradient>
+  </defs>
+</svg>
