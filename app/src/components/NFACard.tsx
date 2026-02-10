@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Star, Users, Zap, TrendingUp } from 'lucide-react'
 import { type NFAAgent, AVATAR_STYLES, RARITY_CONFIG } from '@/lib/agents'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface NFACardProps {
   agent: NFAAgent
@@ -15,18 +16,20 @@ interface NFACardProps {
 function AgentAvatar({ agent, size = 'sm' }: { agent: NFAAgent; size?: 'sm' | 'md' | 'lg' }) {
   const style = AVATAR_STYLES[agent.avatarStyle]
   const dims = size === 'lg' ? 'w-32 h-32' : size === 'md' ? 'w-20 h-20' : 'w-14 h-14'
-  const textSize = size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-2xl' : 'text-lg'
+  const imgSize = size === 'lg' ? 128 : size === 'md' ? 80 : 56
 
   return (
     <div className={`relative ${dims} rounded-full overflow-hidden border-2 ${style.borderGlow}`}
       style={{ borderColor: style.colors[0] + '40' }}>
-      <div className={`w-full h-full ${style.bgPattern} flex items-center justify-center`}>
-        <span className={`${textSize} font-bold`} style={{ color: style.colors[0] }}>
-          {agent.name.charAt(0)}
-        </span>
-      </div>
+      <Image
+        src={`/avatars/${agent.id}.png`}
+        alt={agent.name}
+        width={imgSize}
+        height={imgSize}
+        className="w-full h-full object-cover"
+      />
       {/* Holographic shimmer */}
-      <div className="absolute inset-0 opacity-30"
+      <div className="absolute inset-0 opacity-20"
         style={{
           background: `linear-gradient(135deg, ${style.colors[0]}33 0%, transparent 50%, ${style.colors[1]}33 100%)`,
         }} />
