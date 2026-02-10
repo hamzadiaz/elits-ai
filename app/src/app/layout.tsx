@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { WalletProviderWrapper } from '@/components/WalletProvider'
 import { Navbar } from '@/components/Navbar'
-import { ToastProvider } from '@/components/Toast'
+import { ClientProviders } from '@/components/ClientProviders'
 
 export const metadata: Metadata = {
   title: 'Elits — Non-Fungible Agents on Solana',

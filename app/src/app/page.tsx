@@ -143,7 +143,7 @@ export default function LandingPage() {
 
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
             className="mb-8">
-            <span className="text-xl sm:text-2xl lg:text-3xl font-light tracking-wide text-amber-400/70">Non-Fungible Agents</span>
+            <span className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-amber-400/70">Non-Fungible Agents</span>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
