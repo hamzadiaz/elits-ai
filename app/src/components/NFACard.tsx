@@ -17,17 +17,25 @@ function AgentAvatar({ agent, size = 'sm' }: { agent: NFAAgent; size?: 'xs' | 's
   const style = AVATAR_STYLES[agent.avatarStyle]
   const dims = size === 'lg' ? 'w-32 h-32' : size === 'md' ? 'w-20 h-20' : size === 'xs' ? 'w-8 h-8' : 'w-14 h-14'
   const imgSize = size === 'lg' ? 128 : size === 'md' ? 80 : size === 'xs' ? 32 : 56
+  const isCustom = agent.id.startsWith('custom-')
+  const textSize = size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-2xl' : size === 'xs' ? 'text-xs' : 'text-lg'
 
   return (
     <div className={`relative ${dims} rounded-full overflow-hidden border-2 ${style.borderGlow}`}
       style={{ borderColor: style.colors[0] + '40' }}>
-      <Image
-        src={`/avatars/${agent.id}.png`}
-        alt={agent.name}
-        width={imgSize}
-        height={imgSize}
-        className="w-full h-full object-cover"
-      />
+      {isCustom ? (
+        <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${style.gradient}`}>
+          <span className={`${textSize} font-bold text-white/80`}>{agent.name.charAt(0)}</span>
+        </div>
+      ) : (
+        <Image
+          src={`/avatars/${agent.id}.png`}
+          alt={agent.name}
+          width={imgSize}
+          height={imgSize}
+          className="w-full h-full object-cover"
+        />
+      )}
       {/* Holographic shimmer */}
       <div className="absolute inset-0 opacity-20"
         style={{

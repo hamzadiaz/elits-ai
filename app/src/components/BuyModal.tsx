@@ -64,8 +64,11 @@ export function BuyModal({ agent, onClose, onSuccess }: BuyModalProps) {
             hash = ((hash << 5) - hash + agent.personality.charCodeAt(i)) | 0
           }
           const personalityHash = Math.abs(hash).toString(16).padStart(16, '0')
+          // Convert wallet-standard publicKey to web3.js PublicKey
+          const { PublicKey: PK } = await import('@solana/web3.js')
+          const ownerPK = new PK(publicKey.toBase58())
           await createElitOnChain(
-            program, publicKey, agent.name,
+            program, ownerPK, agent.name,
             agent.description.slice(0, 200),
             personalityHash.slice(0, 64),
             agent.avatarStyle
@@ -179,7 +182,7 @@ export function BuyModal({ agent, onClose, onSuccess }: BuyModalProps) {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-white/[0.08] text-[11px] text-white/40 hover:text-white/60 transition-all">
                     <ExternalLink className="w-3 h-3" /> View on Explorer
                   </a>
-                  <button onClick={onClose}
+                  <button onClick={() => { onClose(); window.location.href = `/chat/${agent.id}` }}
                     className="px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300/70 hover:bg-amber-500/15 transition-all cursor-pointer">
                     Start Chatting
                   </button>
