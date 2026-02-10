@@ -15,6 +15,7 @@ export default function AgentDetailPage() {
   const { addToast, updateToast } = useToast()
   const [agent, setAgent] = useState<NFAAgent | null>(null)
   const [owned, setOwned] = useState(false)
+  const [showBuyModal, setShowBuyModal] = useState(false)
 
   useEffect(() => {
     const a = getAgent(params.id as string)
@@ -37,8 +38,6 @@ export default function AgentDetailPage() {
   const style = AVATAR_STYLES[agent.avatarStyle]
   const rarity = RARITY_CONFIG[agent.rarity]
   const monthlyEstimate = (agent.perUseFee * agent.usageCount * 0.1).toFixed(1)
-
-  const [showBuyModal, setShowBuyModal] = useState(false)
 
   const handleBuy = () => {
     setShowBuyModal(true)
