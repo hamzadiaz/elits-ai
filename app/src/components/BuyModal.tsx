@@ -6,6 +6,7 @@ import { X, Zap, ExternalLink, Wallet, AlertTriangle, CheckCircle, Loader2 } fro
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { type NFAAgent, buyAgent, AVATAR_STYLES, RARITY_CONFIG } from '@/lib/agents'
+import { getConnection, getProvider, getProgram, createElitOnChain } from '@/lib/solana'
 
 const TREASURY = new PublicKey('HzDYrbRCPjQVk5yBXTvHqSLNZnKkqjvF9X4N8xTo4Kej')
 const DEVNET_RPC = 'https://api.devnet.solana.com'
@@ -17,10 +18,11 @@ interface BuyModalProps {
 }
 
 export function BuyModal({ agent, onClose, onSuccess }: BuyModalProps) {
-  const { publicKey, sendTransaction, connected } = useWallet()
+  const { publicKey, sendTransaction, signTransaction, signAllTransactions, connected } = useWallet()
   const [status, setStatus] = useState<'confirm' | 'sending' | 'success' | 'error'>('confirm')
   const [txSig, setTxSig] = useState('')
   const [error, setError] = useState('')
+  const [chainWarning, setChainWarning] = useState('')
 
   const style = AVATAR_STYLES[agent.avatarStyle]
   const rarity = RARITY_CONFIG[agent.rarity]
@@ -49,6 +51,31 @@ export function BuyModal({ agent, onClose, onSuccess }: BuyModalProps) {
       // Mark as owned in localStorage
       buyAgent(agent.id)
       setTxSig(sig)
+
+      // Try to create Elit on-chain (1 per wallet limitation — v1)
+      if (signTransaction && signAllTransactions) {
+        try {
+          const connection = getConnection()
+          const provider = getProvider(connection, { publicKey, signTransaction, signAllTransactions } as never)
+          const program = getProgram(provider)
+          // Simple hash of personality text
+          let hash = 0
+          for (let i = 0; i < agent.personality.length; i++) {
+            hash = ((hash << 5) - hash + agent.personality.charCodeAt(i)) | 0
+          }
+          const personalityHash = Math.abs(hash).toString(16).padStart(16, '0')
+          await createElitOnChain(
+            program, publicKey, agent.name,
+            agent.description.slice(0, 200),
+            personalityHash.slice(0, 64),
+            agent.avatarStyle
+          )
+        } catch (chainErr) {
+          console.warn('On-chain create_elit failed (may already have one per wallet — v1 limitation):', chainErr)
+          setChainWarning('On-chain registration skipped (1 Elit per wallet in v1). Purchase still valid.')
+        }
+      }
+
       setStatus('success')
       onSuccess(sig)
     } catch (err) {
@@ -135,6 +162,12 @@ export function BuyModal({ agent, onClose, onSuccess }: BuyModalProps) {
                 <CheckCircle className="w-12 h-12 text-emerald-400/60 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-white/80 mb-1">Purchase Complete! 🎉</h3>
                 <p className="text-[12px] text-white/40 mb-4">You now own <strong className="text-white/60">{agent.name}</strong></p>
+
+                {chainWarning && (
+                  <div className="rounded-xl bg-amber-500/[0.04] border border-amber-500/[0.1] p-3 mb-3">
+                    <p className="text-[10px] text-amber-300/50">{chainWarning}</p>
+                  </div>
+                )}
 
                 <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3 mb-4">
                   <p className="text-[9px] text-white/20 uppercase tracking-wider mb-1">Transaction</p>
