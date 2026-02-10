@@ -45,14 +45,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-surface min-h-screen bg-grid antialiased">
-        <WalletProviderWrapper>
-          <ToastProvider>
-            <Navbar />
-            <main className="pt-16">
-              {children}
-            </main>
-          </ToastProvider>
-        </WalletProviderWrapper>
+        <ClientProviders>
+          <Navbar />
+          <main className="pt-16">
+            {children}
+          </main>
+        </ClientProviders>
       </body>
     </html>
   )
