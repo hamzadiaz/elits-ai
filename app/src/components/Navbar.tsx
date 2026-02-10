@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { Zap, Menu, X, Droplets } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
+// solana web3 removed - using faucet redirect instead
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -29,20 +29,9 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { publicKey, connected } = useWallet()
-  const [airdropping, setAirdropping] = useState(false)
-
-  const requestAirdrop = useCallback(async () => {
-    if (!publicKey || airdropping) return
-    setAirdropping(true)
-    try {
-      const connection = new Connection('https://api.devnet.solana.com', 'confirmed')
-      const sig = await connection.requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL)
-      await connection.confirmTransaction(sig, 'confirmed')
-    } catch (err) {
-      console.error('Airdrop failed:', err)
-    }
-    setAirdropping(false)
-  }, [publicKey, airdropping])
+  const openFaucet = useCallback(() => {
+    window.open('https://faucet.solana.com/', '_blank')
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -101,13 +90,12 @@ export function Navbar() {
             <div className="flex items-center gap-3">
               {connected && (
                 <button
-                  onClick={requestAirdrop}
-                  disabled={airdropping}
+                  onClick={openFaucet}
                   title="Get 2 devnet SOL"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/[0.08] border border-cyan-500/20 text-cyan-300/60 text-[11px] font-medium hover:bg-cyan-500/[0.12] transition-all disabled:opacity-40 cursor-pointer"
                 >
-                  <Droplets className={`w-3 h-3 ${airdropping ? 'animate-pulse' : ''}`} />
-                  <span className="hidden sm:inline">{airdropping ? 'Airdropping...' : 'Airdrop'}</span>
+                  <Droplets className="w-3 h-3" />
+                  <span className="hidden sm:inline">Faucet</span>
                 </button>
               )}
               <WalletMultiButton style={{
