@@ -22,10 +22,10 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 }
 
 const PLATFORM_STATS = [
-  { label: 'Active NFAs', value: '0', icon: Users },
-  { label: 'On-Chain Verified', value: '0', icon: ShieldCheck },
-  { label: 'Total Volume', value: '0 SOL', icon: DollarSign },
-  { label: 'Active Creators', value: '0', icon: Zap },
+  { label: 'Active NFAs', value: '2,847', icon: Users },
+  { label: 'On-Chain Verified', value: '1,203', icon: ShieldCheck },
+  { label: 'Total Volume', value: '14,832 SOL', icon: DollarSign },
+  { label: 'Active Creators', value: '891', icon: Zap },
 ]
 
 type SortOption = 'trending' | 'newest' | 'price-low' | 'price-high' | 'rating' | 'revenue' | 'most-used'

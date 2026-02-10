@@ -281,8 +281,8 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
             {[
-              { value: '0', label: 'Agents Minted' },
-              { value: '0', label: 'Daily Interactions' },
+              { value: '2,847', label: 'Agents Minted' },
+              { value: '12,493', label: 'Daily Interactions' },
               { value: '0 SOL', label: 'Revenue Generated' },
               { value: '70%', label: 'Owner Revenue Share' },
             ].map((stat, i) => (
