@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NFACard } from '@/components/NFACard'
-import { DEMO_AGENTS, CATEGORIES, type AgentCategory, type NFAAgent, buyAgent, getOwnedAgents } from '@/lib/agents'
+import { DEMO_AGENTS, CATEGORIES, type AgentCategory, type NFAAgent, buyAgent, getOwnedAgents, getAllAgents } from '@/lib/agents'
 import { useToast } from '@/components/Toast'
 import {
   Search, Sparkles, TrendingUp, Users, ShieldCheck, Zap, Grid3x3, LayoutGrid,
@@ -68,10 +68,11 @@ export default function MarketplacePage() {
   useEffect(() => { setOwned(getOwnedAgents()) }, [])
   useEffect(() => { setPage(1) }, [search, category, sortBy])
 
-  const featured = DEMO_AGENTS.filter(a => a.rarity === 'legendary')
+  const allAgents = getAllAgents()
+  const featured = allAgents.filter(a => a.rarity === 'legendary')
 
   const filtered = useMemo(() => {
-    return DEMO_AGENTS
+    return allAgents
       .filter(a => category === 'all' || a.category === category)
       .filter(a =>
         !search || a.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -185,7 +186,7 @@ export default function MarketplacePage() {
               </button>
               {CATEGORIES.map(cat => {
                 const Icon = CATEGORY_ICONS[cat] || Brain
-                const count = DEMO_AGENTS.filter(a => a.category === cat).length
+                const count = allAgents.filter(a => a.category === cat).length
                 return (
                   <button
                     key={cat}

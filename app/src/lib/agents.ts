@@ -822,12 +822,40 @@ export const CATEGORIES: AgentCategory[] = [
   'Translation', 'Voice / Persona', 'DAO', 'Real Estate', 'Recruiting',
 ]
 
+export function getUserCreatedAgents(): NFAAgent[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = JSON.parse(localStorage.getItem('createdNFAs') || '[]')
+    return raw.map((a: Record<string, unknown>) => ({
+      id: a.id as string || `custom-${Date.now()}`,
+      name: a.name as string || 'Unnamed Agent',
+      description: a.description as string || '',
+      category: (a.category as AgentCategory) || 'Creative',
+      personality: a.systemPrompt as string || a.personality as string || '',
+      avatarStyle: (a.avatarStyle as AvatarStyle) || 'golden-holographic',
+      skills: Array.isArray(a.skills) ? a.skills : [],
+      price: (a.mintPrice as number) || (a.price as number) || 1.0,
+      perUseFee: (a.perUseFee as number) || 0.002,
+      creator: 'You',
+      rating: 0,
+      usageCount: 0,
+      revenueGenerated: 0,
+      rarity: (a.rarity as Rarity) || 'common',
+      ownerCount: 1,
+    }))
+  } catch { return [] }
+}
+
+export function getAllAgents(): NFAAgent[] {
+  return [...DEMO_AGENTS, ...getUserCreatedAgents()]
+}
+
 export function getAgent(id: string): NFAAgent | undefined {
-  return DEMO_AGENTS.find(a => a.id === id)
+  return getAllAgents().find(a => a.id === id)
 }
 
 export function getAgentsByCategory(category: AgentCategory): NFAAgent[] {
-  return DEMO_AGENTS.filter(a => a.category === category)
+  return getAllAgents().filter(a => a.category === category)
 }
 
 // Mock ownership via localStorage
