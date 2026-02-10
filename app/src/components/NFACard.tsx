@@ -13,10 +13,10 @@ interface NFACardProps {
   owned?: boolean
 }
 
-function AgentAvatar({ agent, size = 'sm' }: { agent: NFAAgent; size?: 'sm' | 'md' | 'lg' }) {
+function AgentAvatar({ agent, size = 'sm' }: { agent: NFAAgent; size?: 'xs' | 'sm' | 'md' | 'lg' }) {
   const style = AVATAR_STYLES[agent.avatarStyle]
-  const dims = size === 'lg' ? 'w-32 h-32' : size === 'md' ? 'w-20 h-20' : 'w-14 h-14'
-  const imgSize = size === 'lg' ? 128 : size === 'md' ? 80 : 56
+  const dims = size === 'lg' ? 'w-32 h-32' : size === 'md' ? 'w-20 h-20' : size === 'xs' ? 'w-8 h-8' : 'w-14 h-14'
+  const imgSize = size === 'lg' ? 128 : size === 'md' ? 80 : size === 'xs' ? 32 : 56
 
   return (
     <div className={`relative ${dims} rounded-full overflow-hidden border-2 ${style.borderGlow}`}

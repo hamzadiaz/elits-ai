@@ -17,6 +17,7 @@ const links = [
   { href: '/marketplace', label: 'Marketplace' },
   { href: '/create', label: 'Create' },
   { href: '/train', label: 'Train' },
+  { href: '/battle', label: 'Battle' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/turing', label: 'Turing Test' },
 ]
