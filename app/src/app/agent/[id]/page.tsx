@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useParams, useRouter } from 'next/navigation'
 import { getAgent, buyAgent, isAgentOwned, getOwnedAgents, AVATAR_STYLES, RARITY_CONFIG, type NFAAgent } from '@/lib/agents'
 import { AgentAvatar } from '@/components/NFACard'
+import { BuyModal } from '@/components/BuyModal'
 import { useToast } from '@/components/Toast'
 import { Star, Users, TrendingUp, Zap, MessageSquare, ChevronLeft, DollarSign, ShieldCheck, Copy } from 'lucide-react'
 
@@ -37,13 +38,15 @@ export default function AgentDetailPage() {
   const rarity = RARITY_CONFIG[agent.rarity]
   const monthlyEstimate = (agent.perUseFee * agent.usageCount * 0.1).toFixed(1)
 
+  const [showBuyModal, setShowBuyModal] = useState(false)
+
   const handleBuy = () => {
-    const toastId = addToast({ type: 'loading', message: `Purchasing ${agent.name}...` })
-    setTimeout(() => {
-      const sig = buyAgent(agent.id)
-      setOwned(true)
-      updateToast(toastId, { type: 'success', message: `${agent.name} is yours!`, txSignature: sig })
-    }, 1500)
+    setShowBuyModal(true)
+  }
+
+  const handleBuySuccess = () => {
+    setOwned(true)
+    addToast({ type: 'success', message: `${agent.name} is yours!` })
   }
 
   return (
@@ -222,6 +225,14 @@ export default function AgentDetailPage() {
           </motion.div>
         </div>
       </div>
+
+      {showBuyModal && (
+        <BuyModal
+          agent={agent}
+          onClose={() => setShowBuyModal(false)}
+          onSuccess={handleBuySuccess}
+        />
+      )}
     </div>
   )
 }

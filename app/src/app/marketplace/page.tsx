@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NFACard } from '@/components/NFACard'
 import { DEMO_AGENTS, CATEGORIES, type AgentCategory, type NFAAgent, buyAgent, getOwnedAgents, getAllAgents } from '@/lib/agents'
+import { BuyModal } from '@/components/BuyModal'
 import { useToast } from '@/components/Toast'
 import {
   Search, Sparkles, TrendingUp, Users, ShieldCheck, Zap, Grid3x3, LayoutGrid,
@@ -97,13 +98,15 @@ export default function MarketplacePage() {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
+  const [buyModalAgent, setBuyModalAgent] = useState<NFAAgent | null>(null)
+
   const handleBuy = (agent: NFAAgent) => {
-    const toastId = addToast({ type: 'loading', message: `Purchasing ${agent.name}...` })
-    setTimeout(() => {
-      const sig = buyAgent(agent.id)
-      setOwned(getOwnedAgents())
-      updateToast(toastId, { type: 'success', message: `${agent.name} acquired!`, txSignature: sig })
-    }, 1500)
+    setBuyModalAgent(agent)
+  }
+
+  const handleBuySuccess = (sig: string) => {
+    setOwned(getOwnedAgents())
+    addToast({ type: 'success', message: `${buyModalAgent?.name} acquired!`, txSignature: sig })
   }
 
   return (
@@ -332,6 +335,14 @@ export default function MarketplacePage() {
           </Reveal>
         </div>
       </section>
+
+      {buyModalAgent && (
+        <BuyModal
+          agent={buyModalAgent}
+          onClose={() => setBuyModalAgent(null)}
+          onSuccess={handleBuySuccess}
+        />
+      )}
     </div>
   )
 }
