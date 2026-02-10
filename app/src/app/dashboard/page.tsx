@@ -274,103 +274,107 @@ export default function DashboardPage() {
           ))}
         </motion.div>
 
-        {profile ? (
+        {(profile || getOwnedAgents().length > 0) ? (
           <AnimatePresence mode="wait">
             {tab === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-                {/* Profile + XP */}
-                <motion.div variants={fadeUp} className="elite-card rounded-2xl p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="relative">
-                      <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
-                      <div className="absolute -bottom-1 -right-1">
-                        <LevelBadge xp={agentXP} size="sm" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-base font-semibold text-white/90">{profile.name}&apos;s Elit</h2>
-                        <LevelBadge xp={agentXP} size="sm" showTier />
-                      </div>
-                      <p className="text-[13px] text-white/45 mt-0.5 line-clamp-1 font-light">{profile.bio}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/60 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400/80" />
-                        </span>
-                        <span className="text-[11px] text-emerald-400/60 font-medium">Active</span>
-                        <span className="text-[11px] text-white/10">·</span>
-                        <span className="text-[11px] text-white/40 font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-4)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* XP Progress Bar */}
-                  <div className="mb-5">
-                    <XPBar xp={agentXP} />
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {[
-                      { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-amber-300/50' },
-                      { label: 'Actions', value: actions.length.toString(), icon: Activity, color: 'text-amber-300/40' },
-                      { label: 'Delegations', value: delegations.filter(d => d.active).length.toString(), icon: Shield, color: 'text-amber-300/40' },
-                      { label: 'Status', value: hash ? 'Verified' : 'Pending', icon: ShieldCheck, color: hash ? 'text-emerald-400/50' : 'text-amber-400/50' },
-                    ].map(stat => (
-                      <div key={stat.label} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
-                        <stat.icon className={`w-4 h-4 ${stat.color} mb-3`} />
-                        <div className="text-lg font-bold text-white/80">{stat.value}</div>
-                        <div className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Capability Chart + Milestones */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Brain className="w-3.5 h-3.5 text-amber-300/40" />
-                      <h3 className="text-[13px] font-medium text-white/60">Agent Capabilities</h3>
-                    </div>
-                    <CapabilityChart capabilities={capabilities} size={160} />
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Trophy className="w-3.5 h-3.5 text-amber-300/40" />
-                      <h3 className="text-[13px] font-medium text-white/60">Milestones</h3>
-                      <span className="text-[10px] text-white/20 ml-auto">{milestones.length}/9</span>
-                    </div>
-                    <div className="space-y-2">
-                      {milestones.length > 0 ? milestones.slice(0, 5).map(m => (
-                        <div key={m.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.03]">
-                          <span className="text-sm">{m.icon}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-medium text-white/50">{m.name}</p>
-                            <p className="text-[9px] text-white/25">{m.description}</p>
+                {/* Profile + XP — only if created via /create */}
+                {profile && (
+                  <>
+                    <motion.div variants={fadeUp} className="elite-card rounded-2xl p-6">
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="relative">
+                          <Avatar3D avatarUrl={profile.avatarUrl} name={profile.name} size="md" />
+                          <div className="absolute -bottom-1 -right-1">
+                            <LevelBadge xp={agentXP} size="sm" />
                           </div>
                         </div>
-                      )) : (
-                        <p className="text-center text-[12px] text-white/20 py-6">Train your Elit to unlock milestones</p>
-                      )}
-                    </div>
-                  </motion.div>
-                </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-base font-semibold text-white/90">{profile.name}&apos;s Elit</h2>
+                            <LevelBadge xp={agentXP} size="sm" showTier />
+                          </div>
+                          <p className="text-[13px] text-white/45 mt-0.5 line-clamp-1 font-light">{profile.bio}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/60 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400/80" />
+                            </span>
+                            <span className="text-[11px] text-emerald-400/60 font-medium">Active</span>
+                            <span className="text-[11px] text-white/10">·</span>
+                            <span className="text-[11px] text-white/40 font-mono">{publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-4)}</span>
+                          </div>
+                        </div>
+                      </div>
 
-                {hash && (
-                  <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Brain className="w-3.5 h-3.5 text-amber-300/40" />
-                      <h3 className="text-[13px] font-medium text-white/60">Personality Hash</h3>
+                      {/* XP Progress Bar */}
+                      <div className="mb-5">
+                        <XPBar xp={agentXP} />
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {[
+                          { label: 'Skills', value: profile.skills.length.toString(), icon: Zap, color: 'text-amber-300/50' },
+                          { label: 'Actions', value: actions.length.toString(), icon: Activity, color: 'text-amber-300/40' },
+                          { label: 'Delegations', value: delegations.filter(d => d.active).length.toString(), icon: Shield, color: 'text-amber-300/40' },
+                          { label: 'Status', value: hash ? 'Verified' : 'Pending', icon: ShieldCheck, color: hash ? 'text-emerald-400/50' : 'text-amber-400/50' },
+                        ].map(stat => (
+                          <div key={stat.label} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-4 hover:border-white/[0.05] transition-all duration-500">
+                            <stat.icon className={`w-4 h-4 ${stat.color} mb-3`} />
+                            <div className="text-lg font-bold text-white/80">{stat.value}</div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    {/* Capability Chart + Milestones */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Brain className="w-3.5 h-3.5 text-amber-300/40" />
+                          <h3 className="text-[13px] font-medium text-white/60">Agent Capabilities</h3>
+                        </div>
+                        <CapabilityChart capabilities={capabilities} size={160} />
+                      </motion.div>
+
+                      <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Trophy className="w-3.5 h-3.5 text-amber-300/40" />
+                          <h3 className="text-[13px] font-medium text-white/60">Milestones</h3>
+                          <span className="text-[10px] text-white/20 ml-auto">{milestones.length}/9</span>
+                        </div>
+                        <div className="space-y-2">
+                          {milestones.length > 0 ? milestones.slice(0, 5).map(m => (
+                            <div key={m.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.03]">
+                              <span className="text-sm">{m.icon}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-medium text-white/50">{m.name}</p>
+                                <p className="text-[9px] text-white/25">{m.description}</p>
+                              </div>
+                            </div>
+                          )) : (
+                            <p className="text-center text-[12px] text-white/20 py-6">Train your Elit to unlock milestones</p>
+                          )}
+                        </div>
+                      </motion.div>
                     </div>
-                    <div className="bg-white/[0.04] border border-white/[0.06] p-4 rounded-xl">
-                      <p className="font-mono text-[11px] text-amber-300/30 break-all">{hash}</p>
-                    </div>
-                  </motion.div>
+
+                    {hash && (
+                      <motion.div variants={fadeUp} className="elite-card rounded-2xl p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Brain className="w-3.5 h-3.5 text-amber-300/40" />
+                          <h3 className="text-[13px] font-medium text-white/60">Personality Hash</h3>
+                        </div>
+                        <div className="bg-white/[0.04] border border-white/[0.06] p-4 rounded-xl">
+                          <p className="font-mono text-[11px] text-amber-300/30 break-all">{hash}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </>
                 )}
 
-                {/* My NFAs */}
+                {/* My NFAs — always shown */}
                 <MyNFAsSection />
 
                 {/* Quick actions */}
