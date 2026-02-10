@@ -8,17 +8,17 @@ interface Message { role: 'user' | 'elit'; content: string }
 
 interface ChatInterfaceProps {
   messages: Message[]; onSend: (message: string) => void; isLoading: boolean
-  title?: string; subtitle?: string; placeholder?: string
+  title?: string; subtitle?: string; placeholder?: string; isStreaming?: boolean
 }
 
-export function ChatInterface({ messages, onSend, isLoading, title, subtitle, placeholder }: ChatInterfaceProps) {
+export function ChatInterface({ messages, onSend, isLoading, title, subtitle, placeholder, isStreaming }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   const handleSubmit = () => {
-    if (!input.trim() || isLoading) return
+    if (!input.trim() || isLoading || isStreaming) return
     onSend(input.trim()); setInput('')
   }
 
@@ -54,10 +54,17 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
                     <div className="w-3.5 h-3.5 rounded-md bg-amber-500/[0.1] flex items-center justify-center">
                       <Brain className="w-2 h-2 text-amber-300/40" />
                     </div>
-                    <span className="text-[9px] font-medium text-white/35 uppercase tracking-wider">Elit</span>
+                    <span className="text-[9px] font-medium text-white/35 uppercase tracking-wider">
+                      {isStreaming && i === messages.length - 1 ? 'Streaming...' : 'Elit'}
+                    </span>
                   </div>
                 )}
-                <p className="text-[13px] leading-relaxed whitespace-pre-wrap font-light">{msg.content}</p>
+                <p className="text-[13px] leading-relaxed whitespace-pre-wrap font-light">
+                  {msg.content}
+                  {isStreaming && i === messages.length - 1 && msg.role === 'elit' && (
+                    <span className="inline-block w-1.5 h-4 bg-amber-400/60 ml-0.5 animate-pulse" />
+                  )}
+                </p>
               </div>
             </motion.div>
           ))}
@@ -99,7 +106,7 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
           <button className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/35 hover:text-amber-300/40 hover:border-amber-500/20 transition-all shrink-0 cursor-pointer" title="Voice">
             <Mic className="w-3.5 h-3.5" />
           </button>
-          <button onClick={handleSubmit} disabled={!input.trim() || isLoading}
+          <button onClick={handleSubmit} disabled={!input.trim() || isLoading || isStreaming}
             className="p-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/80 disabled:opacity-20 hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer">
             <Send className="w-3.5 h-3.5" />
           </button>

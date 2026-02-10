@@ -1,26 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { useParams, useRouter } from 'next/navigation'
 import { ChatInterface } from '@/components/ChatInterface'
 import { AgentAvatar } from '@/components/NFACard'
 import { getAgent, isAgentOwned, type NFAAgent } from '@/lib/agents'
-import { ShieldCheck, Brain, ChevronRight, Lock, Zap, DollarSign } from 'lucide-react'
-
-interface Message {
-  role: 'user' | 'elit'
-  content: string
-}
+import { loadChatHistory, saveChatHistory, clearChatHistory, type ChatMessage } from '@/lib/chatMemory'
+import { ShieldCheck, Brain, ChevronRight, Lock, Zap, DollarSign, Trash2 } from 'lucide-react'
 
 export default function AgentChatPage() {
   const params = useParams()
   const router = useRouter()
   const [agent, setAgent] = useState<NFAAgent | null>(null)
   const [owned, setOwned] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isNFAAgent, setIsNFAAgent] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
 
   useEffect(() => {
     const id = params.id as string
@@ -31,13 +28,19 @@ export default function AgentChatPage() {
       setIsNFAAgent(true)
       setOwned(isAgentOwned(nfaAgent.id))
       if (isAgentOwned(nfaAgent.id)) {
-        setMessages([{
-          role: 'elit',
-          content: `Hey! I'm ${nfaAgent.name}. ${nfaAgent.description.split('.')[0]}. What can I help you with?`,
-        }])
+        const history = loadChatHistory(nfaAgent.id)
+        if (history.length > 0) {
+          setMessages(history)
+        } else {
+          const welcome: ChatMessage[] = [{
+            role: 'elit',
+            content: `Hey! I'm ${nfaAgent.name}. ${nfaAgent.description.split('.')[0]}. What can I help you with?`,
+          }]
+          setMessages(welcome)
+          saveChatHistory(nfaAgent.id, welcome)
+        }
       }
     } else {
-      // Fall back to legacy elit chat
       const prompt = localStorage.getItem('elitSystemPrompt')
       const profile = localStorage.getItem('elitProfile')
       if (prompt && profile) {
@@ -61,20 +64,45 @@ export default function AgentChatPage() {
             ownerCount: 1,
           })
           setOwned(true)
-          setMessages([{
-            role: 'elit',
-            content: `Hey! I'm ${p.name || 'your Elit'} — the AI version. Ask me anything! 🧠`,
-          }])
-        } catch {}
+          const history = loadChatHistory('legacy')
+          if (history.length > 0) {
+            setMessages(history)
+          } else {
+            setMessages([{
+              role: 'elit',
+              content: `Hey! I'm ${p.name || 'your Elit'} — the AI version. Ask me anything! 🧠`,
+            }])
+          }
+        } catch { /* ignore */ }
       }
     }
   }, [params.id])
 
+  // Save messages whenever they change
+  useEffect(() => {
+    if (agent && messages.length > 0 && !isLoading) {
+      saveChatHistory(agent.id, messages)
+    }
+  }, [messages, agent, isLoading])
+
+  const handleClearHistory = useCallback(() => {
+    if (!agent) return
+    clearChatHistory(agent.id)
+    const welcome: ChatMessage[] = [{
+      role: 'elit',
+      content: `Hey! I'm ${agent.name}. ${agent.description.split('.')[0]}. What can I help you with?`,
+    }]
+    setMessages(welcome)
+    saveChatHistory(agent.id, welcome)
+  }, [agent])
+
   const handleSend = async (content: string) => {
     if (!agent) return
-    const newMessages: Message[] = [...messages, { role: 'user', content }]
+    const newMessages: ChatMessage[] = [...messages, { role: 'user', content }]
     setMessages(newMessages)
     setIsLoading(true)
+    setStreamingContent('')
+
     try {
       const systemPrompt = isNFAAgent ? agent.personality : (localStorage.getItem('elitSystemPrompt') || '')
       const res = await fetch('/api/chat', {
@@ -85,13 +113,46 @@ export default function AgentChatPage() {
           systemPrompt,
         }),
       })
-      const data = await res.json()
-      setMessages([...newMessages, { role: 'elit', content: data.response }])
+
+      if (!res.ok) throw new Error('API error')
+
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let accumulated = ''
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim()
+            if (data === '[DONE]') break
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.text) {
+                accumulated += parsed.text
+                setStreamingContent(accumulated)
+              }
+            } catch { /* skip */ }
+          }
+        }
+      }
+
+      const finalContent = accumulated || 'Sorry, I had trouble generating a response.'
+      setMessages([...newMessages, { role: 'elit', content: finalContent }])
+      setStreamingContent('')
     } catch (err) {
       console.error(err)
       setMessages([...newMessages, { role: 'elit', content: 'Sorry, I had trouble generating a response.' }])
     } finally {
       setIsLoading(false)
+      setStreamingContent('')
     }
   }
 
@@ -167,28 +228,25 @@ export default function AgentChatPage() {
               </div>
             )}
           </div>
+          <button
+            onClick={handleClearHistory}
+            title="Clear chat history"
+            className="p-2 rounded-lg border border-white/[0.06] bg-white/[0.03] text-white/25 hover:text-red-400/60 hover:border-red-400/20 transition-all cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
-
-        {isLoading && (
-          <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 mt-2 ml-12">
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08]">
-              <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" />
-              <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
-              <div className="w-1.5 h-1.5 bg-primary-light/60 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
-              <span className="text-[10px] text-white/25 ml-1">{agent.name} is thinking...</span>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       <div className="flex-1 mx-4 my-2 rounded-2xl overflow-hidden border border-white/[0.08]">
         <ChatInterface
-          messages={messages}
+          messages={streamingContent ? [...messages, { role: 'elit' as const, content: streamingContent }] : messages}
           onSend={handleSend}
-          isLoading={isLoading}
+          isLoading={isLoading && !streamingContent}
           title={agent.name}
           subtitle={isNFAAgent ? `${agent.category} · ${agent.perUseFee} SOL per message` : '✅ Verified · Personality-driven responses'}
           placeholder={`Ask ${agent.name} anything...`}
+          isStreaming={!!streamingContent}
         />
       </div>
     </div>
