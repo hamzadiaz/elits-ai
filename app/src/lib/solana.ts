@@ -28,8 +28,12 @@ export function getProgram(provider: AnchorProvider) {
   return new Program(IDL as unknown as Idl, PROGRAM_ID, provider)
 }
 
-export function getProvider(connection: Connection, wallet: { publicKey: PublicKey; signTransaction: (...args: unknown[]) => unknown; signAllTransactions: (...args: unknown[]) => unknown }) {
-  return new AnchorProvider(connection, wallet as never, { commitment: 'confirmed' })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getProvider(connection: Connection, wallet: { publicKey: any; signTransaction: any; signAllTransactions: any }) {
+  // Ensure publicKey is a proper @solana/web3.js PublicKey (wallet-standard may wrap differently)
+  const pk = wallet.publicKey instanceof PublicKey ? wallet.publicKey : new PublicKey(wallet.publicKey.toBase58 ? wallet.publicKey.toBase58() : String(wallet.publicKey))
+  const wrappedWallet = { ...wallet, publicKey: pk }
+  return new AnchorProvider(connection, wrappedWallet as never, { commitment: 'confirmed' })
 }
 
 export function explorerUrl(sig: string) {

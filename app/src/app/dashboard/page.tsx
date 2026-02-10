@@ -24,7 +24,15 @@ import { TrendingUp, DollarSign, Star } from 'lucide-react'
 
 function MyNFAsSection() {
   const [ownedIds, setOwnedIds] = useState<string[]>([])
-  useEffect(() => { setOwnedIds(getOwnedAgents()) }, [])
+  useEffect(() => {
+    setOwnedIds(getOwnedAgents())
+    // Listen for storage changes (from BuyModal in other tabs or same page)
+    const onStorage = () => setOwnedIds(getOwnedAgents())
+    window.addEventListener('storage', onStorage)
+    // Also poll briefly in case buy just happened
+    const timer = setTimeout(onStorage, 500)
+    return () => { window.removeEventListener('storage', onStorage); clearTimeout(timer) }
+  }, [])
   const ownedAgents = DEMO_AGENTS.filter(a => ownedIds.includes(a.id))
   const totalRevenue = ownedAgents.reduce((sum, a) => sum + a.revenueGenerated, 0)
   const portfolioValue = ownedAgents.reduce((sum, a) => sum + a.price, 0)
@@ -124,6 +132,7 @@ export default function DashboardPage() {
   const [newExpiry, setNewExpiry] = useState('7')
   const [newRestrictions, setNewRestrictions] = useState('')
   const [killSwitchConfirm, setKillSwitchConfirm] = useState(false)
+  const [hasOwnedNFAs, setHasOwnedNFAs] = useState(false)
   const [txPending, setTxPending] = useState(false)
   const [lastTxSig, setLastTxSig] = useState('')
   const [txError, setTxError] = useState('')
@@ -140,6 +149,7 @@ export default function DashboardPage() {
     if (stored) try { setProfile(JSON.parse(stored)) } catch {}
     if (storedHash) setHash(storedHash)
     if (storedActions) try { setActions(JSON.parse(storedActions)) } catch {}
+    setHasOwnedNFAs(getOwnedAgents().length > 0)
   }, [])
 
   // Calculate XP and capabilities when profile changes
@@ -274,7 +284,7 @@ export default function DashboardPage() {
           ))}
         </motion.div>
 
-        {(profile || getOwnedAgents().length > 0) ? (
+        {(profile || hasOwnedNFAs) ? (
           <AnimatePresence mode="wait">
             {tab === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
