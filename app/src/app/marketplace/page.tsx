@@ -22,10 +22,10 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 }
 
 const PLATFORM_STATS = [
-  { label: 'Active NFAs', value: '2,847', icon: Users },
-  { label: 'On-Chain Verified', value: '1,250', icon: ShieldCheck },
-  { label: 'Total Volume', value: '48K SOL', icon: DollarSign },
-  { label: 'Active Creators', value: '892', icon: Zap },
+  { label: 'Active NFAs', value: '0', icon: Users },
+  { label: 'On-Chain Verified', value: '0', icon: ShieldCheck },
+  { label: 'Total Volume', value: '0 SOL', icon: DollarSign },
+  { label: 'Active Creators', value: '0', icon: Zap },
 ]
 
 type SortOption = 'trending' | 'newest' | 'price-low' | 'price-high' | 'rating' | 'revenue' | 'most-used'
@@ -57,7 +57,7 @@ function Reveal({ children, delay = 0, className = '' }: { children: React.React
   )
 }
 
-export default function ExplorePage() {
+export default function MarketplacePage() {
   const { addToast, updateToast } = useToast()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<'all' | AgentCategory>('all')

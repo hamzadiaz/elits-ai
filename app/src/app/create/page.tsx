@@ -668,7 +668,7 @@ export default function CreatePage() {
           </div>
 
           <div className="flex gap-3 justify-center">
-            <button onClick={() => router.push('/explore')}
+            <button onClick={() => router.push('/marketplace')}
               className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-all cursor-pointer">
               View on Marketplace <ExternalLink className="w-3.5 h-3.5 opacity-50" />
             </button>

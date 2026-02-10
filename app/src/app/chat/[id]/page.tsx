@@ -131,8 +131,8 @@ export default function AgentChatPage() {
           </div>
           <h1 className="text-2xl font-bold gradient-text-white mb-3">No Agent Found</h1>
           <p className="text-white/40 mb-8 text-[13px] font-light">Browse the marketplace to find an agent.</p>
-          <a href="/explore" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-transform">
-            Explore NFAs
+          <a href="/marketplace" className="group inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white/90 font-medium text-[13px] btn-glow hover:scale-[1.02] transition-transform">
+            Browse Marketplace
             <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-all" />
           </a>
         </motion.div>

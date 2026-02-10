@@ -25,7 +25,7 @@ export default function AgentDetailPage() {
       <div className="min-h-[85vh] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white/40 mb-4">Agent not found</p>
-          <button onClick={() => router.push('/explore')} className="text-amber-400/60 text-sm hover:text-amber-400 transition-colors cursor-pointer">
+          <button onClick={() => router.push('/marketplace')} className="text-amber-400/60 text-sm hover:text-amber-400 transition-colors cursor-pointer">
             ← Back to marketplace
           </button>
         </div>
@@ -53,7 +53,7 @@ export default function AgentDetailPage() {
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={() => router.push('/explore')}
+          onClick={() => router.push('/marketplace')}
           className="flex items-center gap-1 text-[12px] text-white/30 hover:text-white/60 transition-colors mb-8 cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" /> Back to marketplace

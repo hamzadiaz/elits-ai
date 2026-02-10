@@ -33,7 +33,7 @@ function MyNFAsSection() {
     <motion.div variants={{ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } }} className="elite-card rounded-2xl p-6 text-center">
       <h3 className="text-[13px] font-semibold text-white/60 mb-2">My NFAs</h3>
       <p className="text-[12px] text-white/25 mb-4">You don&apos;t own any NFAs yet.</p>
-      <Link href="/explore" className="text-[11px] text-amber-400/60 hover:text-amber-400 transition-colors">Browse Marketplace →</Link>
+      <Link href="/marketplace" className="text-[11px] text-amber-400/60 hover:text-amber-400 transition-colors">Browse Marketplace →</Link>
     </motion.div>
   )
 
@@ -380,7 +380,7 @@ export default function DashboardPage() {
                     { href: '/chat/default', icon: MessageSquare, title: 'Chat', desc: 'Test your agent' },
                     { href: '/verify/default', icon: ShieldCheck, title: 'Verify', desc: 'On-chain proof' },
                     { href: '/turing', icon: Eye, title: 'Turing Test', desc: 'Real vs AI' },
-                    { href: '/explore', icon: Activity, title: 'Explore', desc: 'Agent marketplace' },
+                    { href: '/marketplace', icon: Activity, title: 'Marketplace', desc: 'Agent marketplace' },
                   ].map(action => (
                     <Link key={action.href} href={action.href} className="group elite-card rounded-2xl p-5">
                       <div className="w-9 h-9 rounded-xl bg-amber-500/[0.06] border border-amber-500/15 flex items-center justify-center mb-3 group-hover:bg-amber-500/[0.1] group-hover:border-amber-500/25 group-hover:scale-105 transition-all duration-500">

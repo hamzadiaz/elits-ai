@@ -112,9 +112,9 @@ const steps = [
 ]
 
 const stats = [
-  { label: 'AI Agents Created', value: 2847, suffix: '+' },
-  { label: 'On-Chain Verifications', value: 12500, suffix: '+' },
-  { label: 'Training Sessions', value: 48000, suffix: '+' },
+  { label: 'AI Agents Created', value: 0, suffix: '' },
+  { label: 'On-Chain Verifications', value: 0, suffix: '' },
+  { label: 'Training Sessions', value: 0, suffix: '' },
   { label: 'Uptime', value: 99, suffix: '.9%' },
 ]
 
@@ -281,9 +281,9 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
             {[
-              { value: '2,847+', label: 'Agents Minted' },
-              { value: '12.3K', label: 'Daily Interactions' },
-              { value: '$48K+', label: 'Revenue Generated' },
+              { value: '0', label: 'Agents Minted' },
+              { value: '0', label: 'Daily Interactions' },
+              { value: '0 SOL', label: 'Revenue Generated' },
               { value: '70%', label: 'Owner Revenue Share' },
             ].map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.06}>
@@ -296,10 +296,10 @@ export default function LandingPage() {
           </div>
 
           <Reveal delay={0.2} className="text-center">
-            <Link href="/explore"
+            <Link href="/marketplace"
               className="beam-btn group inline-flex items-center gap-2 px-8 py-3.5 bg-white/[0.04] text-white/60 font-medium text-sm hover:bg-white/[0.06] hover:text-white/80 transition-all duration-300">
               <Globe className="w-3.5 h-3.5 opacity-60" />
-              Explore Marketplace
+              Browse Marketplace
               <ArrowRight className="w-3.5 h-3.5 opacity-40 group-hover:translate-x-0.5 group-hover:opacity-70 transition-all" />
             </Link>
           </Reveal>
@@ -319,7 +319,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/explore', icon: Globe, title: 'Browse Marketplace', desc: 'Explore verified agents and templates across 6 categories.' },
+              { href: '/marketplace', icon: Globe, title: 'Browse Marketplace', desc: 'Browse verified agents and templates across 6 categories.' },
               { href: '/create', icon: Sparkles, title: 'Create Your Elit', desc: 'Define your personality and generate a 3D avatar in 4 easy steps.' },
               { href: '/train', icon: Mic, title: 'Train by Voice', desc: 'Have a live conversation with Gemini to teach your agent your skills.' },
               { href: '/turing', icon: Eye, title: 'Take the Turing Test', desc: 'Can you tell the AI from the human? 5 rounds, blind comparison.' },
