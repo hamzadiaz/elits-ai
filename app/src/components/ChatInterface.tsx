@@ -3,15 +3,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Mic, Brain } from 'lucide-react'
+import { ToolCallCard } from '@/components/ToolCard'
 
 interface Message { role: 'user' | 'elit'; content: string }
 
 interface ChatInterfaceProps {
   messages: Message[]; onSend: (message: string) => void; isLoading: boolean
   title?: string; subtitle?: string; placeholder?: string; isStreaming?: boolean
+  toolCalls?: Record<number, { name: string; result: Record<string, unknown> }>
 }
 
-export function ChatInterface({ messages, onSend, isLoading, title, subtitle, placeholder, isStreaming }: ChatInterfaceProps) {
+export function ChatInterface({ messages, onSend, isLoading, title, subtitle, placeholder, isStreaming, toolCalls }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -58,6 +60,9 @@ export function ChatInterface({ messages, onSend, isLoading, title, subtitle, pl
                       {isStreaming && i === messages.length - 1 ? 'Streaming...' : 'Elit'}
                     </span>
                   </div>
+                )}
+                {msg.role === 'elit' && toolCalls?.[i] && (
+                  <ToolCallCard toolCall={toolCalls[i]} />
                 )}
                 <p className="text-[13px] leading-relaxed whitespace-pre-wrap font-light">
                   {msg.content}

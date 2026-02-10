@@ -7,6 +7,7 @@ import { ChatInterface } from '@/components/ChatInterface'
 import { AgentAvatar } from '@/components/NFACard'
 import { getAgent, isAgentOwned, type NFAAgent } from '@/lib/agents'
 import { loadChatHistory, saveChatHistory, clearChatHistory, type ChatMessage } from '@/lib/chatMemory'
+import { ToolCallCard } from '@/components/ToolCard'
 import { ShieldCheck, Brain, ChevronRight, Lock, Zap, DollarSign, Trash2 } from 'lucide-react'
 
 export default function AgentChatPage() {
@@ -18,6 +19,7 @@ export default function AgentChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isNFAAgent, setIsNFAAgent] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
+  const [toolCalls, setToolCalls] = useState<Record<number, { name: string; result: Record<string, unknown> }>>({})
 
   useEffect(() => {
     const id = params.id as string
@@ -111,6 +113,7 @@ export default function AgentChatPage() {
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role === 'elit' ? 'model' : 'user', content: m.content })),
           systemPrompt,
+          agentId: agent.id,
         }),
       })
 
@@ -135,6 +138,11 @@ export default function AgentChatPage() {
             if (data === '[DONE]') break
             try {
               const parsed = JSON.parse(data)
+              if (parsed.toolCall) {
+                // Store tool call for rendering after message is finalized
+                const msgIdx = newMessages.length // index of the elit message we're about to add
+                setToolCalls(prev => ({ ...prev, [msgIdx]: parsed.toolCall }))
+              }
               if (parsed.text) {
                 accumulated += parsed.text
                 setStreamingContent(accumulated)
@@ -247,6 +255,7 @@ export default function AgentChatPage() {
           subtitle={isNFAAgent ? `${agent.category} · ${agent.perUseFee} SOL per message` : '✅ Verified · Personality-driven responses'}
           placeholder={`Ask ${agent.name} anything...`}
           isStreaming={!!streamingContent}
+          toolCalls={toolCalls}
         />
       </div>
     </div>
